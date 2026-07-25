@@ -1,3 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Dungoo brand palette. Single source of truth for both utilities and charts. */
+@theme {
+  --color-primary: #0f172a;
+  --color-accent: #f59e0b;
+  --color-brand-blue: #1b4a8f;
+  --color-surface: #f4f7fb;
+}

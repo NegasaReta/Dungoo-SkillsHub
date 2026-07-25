@@ -17,7 +17,7 @@ export default function ScoreRadarChart({ scores = {} }) {
       <RadarChart data={data}>
         <PolarGrid stroke={brandColors.primary} strokeOpacity={0.15} />
         <PolarAngleAxis dataKey="skill" tick={{ fill: brandColors.primary, fontSize: 12 }} />
-        <PolarRadiusAxis domain={[0, 10]} tick={{ fill: brandColors.primary, fontSize: 10 }} />
+        <PolarRadiusAxis domain={[0, 5]} tick={{ fill: brandColors.primary, fontSize: 10 }} />
         <Radar
           dataKey="value"
           stroke={brandColors.brandBlue}

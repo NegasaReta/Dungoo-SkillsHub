@@ -1,10 +1,13 @@
 /**
- * Dungoo brand palette. Single source of truth: tailwind.config.js reads these,
- * and chart libraries that need raw hex values import them directly.
+ * Chart-friendly handles for the Dungoo brand palette.
+ *
+ * The values themselves live in the `@theme` block in index.css, which Tailwind v4
+ * compiles into these CSS variables. Referencing them keeps charts and utility
+ * classes from drifting apart.
  */
 export const brandColors = {
-  primary: '#0F172A',
-  accent: '#F59E0B',
-  brandBlue: '#1B4A8F',
-  surface: '#F4F7FB',
+  primary: 'var(--color-primary)',
+  accent: 'var(--color-accent)',
+  brandBlue: 'var(--color-brand-blue)',
+  surface: 'var(--color-surface)',
 }
