@@ -5,8 +5,8 @@ export default function LiveFeedback({ feedback }) {
 
   return (
     <Card>
-      <h2 className="font-medium">Feedback</h2>
-      <p className="mt-2 text-sm text-slate-600">{feedback.summary}</p>
+      <h2 className="font-medium text-primary">Feedback</h2>
+      <p className="mt-2 text-sm text-primary/70">{feedback.summary}</p>
     </Card>
   )
 }
