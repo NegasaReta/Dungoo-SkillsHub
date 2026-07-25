@@ -27,6 +27,9 @@ htmlcov/
 .env.*
 !.env.example
 
+# Agent skills (restore with: npx skills experimental_install)
+.agents/skills/
+
 # Editors / OS
 .vscode/
 .idea/
