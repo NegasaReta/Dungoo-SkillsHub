@@ -9,7 +9,8 @@ export default function AppShell({ children }) {
 
   return (
     <div className="min-h-screen bg-surface text-primary">
-      <aside className="fixed inset-y-0 left-0 hidden w-60 lg:block">
+      {/* Navigation is dropped when printing so an exported page is just the content. */}
+      <aside className="fixed inset-y-0 left-0 hidden w-60 lg:block print:hidden">
         <Sidebar />
       </aside>
 
@@ -35,8 +36,10 @@ export default function AppShell({ children }) {
         </div>
       )}
 
-      <div className="lg:pl-60">
-        <Topbar onOpenSidebar={() => setSidebarOpen(true)} />
+      <div className="lg:pl-60 print:pl-0">
+        <div className="print:hidden">
+          <Topbar onOpenSidebar={() => setSidebarOpen(true)} />
+        </div>
         <main className="px-4 py-6 sm:px-6">{children}</main>
       </div>
     </div>

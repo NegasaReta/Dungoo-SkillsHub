@@ -1,7 +1,7 @@
 import NavIcon from '../app/NavIcon.jsx'
 import Panel from '../dashboard/Panel.jsx'
 
-export default function StatCard({ icon, label, value, suffix, changePercent }) {
+export default function StatCard({ icon, label, value, suffix, changePercent, hint }) {
   const positive = changePercent >= 0
 
   return (
@@ -23,6 +23,7 @@ export default function StatCard({ icon, label, value, suffix, changePercent }) 
             </span>
           )}
         </div>
+        {hint && <p className="mt-0.5 truncate text-[11px] text-primary/45">{hint}</p>}
       </div>
     </Panel>
   )

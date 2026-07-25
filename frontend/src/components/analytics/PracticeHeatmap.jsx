@@ -35,7 +35,11 @@ export default function PracticeHeatmap({ activity, streakDays }) {
       </div>
 
       <div className="mt-5 overflow-x-auto pb-1">
-        <div className="flex gap-1">
+        <div
+          role="img"
+          aria-label={`Daily practice over the last ${activity.length} days: ${practiceDays} active days`}
+          className="flex gap-1"
+        >
           {weeks.map((week, index) => (
             <div key={index} className="flex flex-col gap-1">
               {week.map((day) => (

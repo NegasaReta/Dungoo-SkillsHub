@@ -22,6 +22,14 @@ export const DAILY_ANSWER_GOAL = 6
 
 const roleLabel = (slug) => ROLES.find((role) => role.slug === slug)?.label ?? slug
 
+/**
+ * "First" and "latest" session drive trends and milestones, so order is enforced
+ * here rather than trusted from the caller — the history endpoint makes no
+ * ordering promise.
+ */
+const chronological = (sessions) =>
+  [...sessions].sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)))
+
 const mean = (values) =>
   values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0
 
@@ -84,7 +92,7 @@ export const EMPTY_SUMMARY = {
 }
 
 export function summarizeSessions(sessions = [], now = new Date()) {
-  const scored = sessions.filter((session) => session.responses?.length)
+  const scored = chronological(sessions.filter((session) => session.responses?.length))
   if (!scored.length) return EMPTY_SUMMARY
 
   const responses = scored.flatMap((session) => session.responses)
@@ -180,9 +188,11 @@ export function passportScores(summary) {
   }
 }
 
+const round1 = (value) => Math.round(value * 10) / 10
+
 /**
  * One entry per calendar day across the trailing window, oldest first. Days with
- * no practice are kept with `average: null` so a gap reads as a gap in a chart
+ * no practice are kept with null averages so a gap reads as a gap in a chart
  * instead of being smoothed into a flat line.
  */
 export function dailyActivity(sessions = [], days = 30, now = new Date()) {
@@ -190,7 +200,7 @@ export function dailyActivity(sessions = [], days = 30, now = new Date()) {
 
   for (let offset = days - 1; offset >= 0; offset -= 1) {
     const date = shiftDays(now, -offset)
-    buckets.set(dayKey(date), { date, answers: 0, scoreTotal: 0 })
+    buckets.set(dayKey(date), { date, answers: 0, scores: [] })
   }
 
   for (const response of sessions.flatMap((session) => session.responses ?? [])) {
@@ -198,14 +208,180 @@ export function dailyActivity(sessions = [], days = 30, now = new Date()) {
     if (!bucket) continue
 
     bucket.answers += 1
-    bucket.scoreTotal += mean(AXES.map(({ key }) => response[key]))
+    bucket.scores.push(response)
   }
 
-  return [...buckets.values()].map(({ date, answers, scoreTotal }) => ({
-    date,
-    answers,
-    average: answers ? Math.round((scoreTotal / answers) * 10) / 10 : null,
-  }))
+  return [...buckets.values()].map(({ date, answers, scores }) => {
+    const axisMean = (key) => (answers ? round1(mean(scores.map((score) => score[key]))) : null)
+
+    return {
+      date,
+      answers,
+      clarity: axisMean('clarity_score'),
+      confidence: axisMean('confidence_score'),
+      star: axisMean('star_score'),
+      average: answers
+        ? round1(mean(scores.flatMap((score) => AXES.map(({ key }) => score[key]))))
+        : null,
+    }
+  })
+}
+
+function startOfDay(date) {
+  const result = new Date(date)
+  result.setHours(0, 0, 0, 0)
+  return result
+}
+
+function endOfDay(date) {
+  const result = new Date(date)
+  result.setHours(23, 59, 59, 999)
+  return result
+}
+
+/**
+ * Sessions whose answers fall inside a trailing window, `skip` windows back.
+ * Windows snap to whole days so consecutive periods are contiguous: nothing falls
+ * between the current window and the one before it.
+ */
+function sessionsInWindow(sessions, days, skip, now) {
+  const endDay = shiftDays(now, -days * skip)
+  const until = endOfDay(endDay).getTime()
+  const from = startOfDay(shiftDays(endDay, -(days - 1))).getTime()
+
+  return sessions
+    .map((session) => ({
+      ...session,
+      responses: (session.responses ?? []).filter((response) => {
+        const at = new Date(response.created_at ?? now).getTime()
+        return at >= from && at <= until
+      }),
+    }))
+    .filter((session) => session.responses.length)
+}
+
+/**
+ * Totals for the selected window next to the window immediately before it, so the
+ * page can show a change the user can actually attribute to a period.
+ */
+export function rangeStats(sessions = [], days = 30, now = new Date()) {
+  const measure = (skip) => {
+    const scoped = sessionsInWindow(sessions, days, skip, now)
+    const responses = scoped.flatMap((session) => session.responses)
+
+    return {
+      sessionCount: scoped.length,
+      answerCount: responses.length,
+      average: responses.length
+        ? mean(responses.flatMap((response) => AXES.map(({ key }) => response[key])))
+        : 0,
+    }
+  }
+
+  const current = measure(0)
+  const previous = measure(1)
+
+  return {
+    ...current,
+    previous,
+    changePercent:
+      previous.average && current.average
+        ? round1(((current.average - previous.average) / previous.average) * 100)
+        : 0,
+  }
+}
+
+/** Average score per role practised, strongest first. */
+export function roleBreakdown(sessions = []) {
+  const byRole = new Map()
+
+  for (const session of sessions) {
+    if (!session.responses?.length) continue
+
+    const entry = byRole.get(session.role) ?? { sessions: 0, scores: [] }
+    entry.sessions += 1
+    entry.scores.push(...session.responses)
+    byRole.set(session.role, entry)
+  }
+
+  return [...byRole.entries()]
+    .map(([role, entry]) => ({
+      role,
+      label: roleLabel(role),
+      sessions: entry.sessions,
+      answers: entry.scores.length,
+      average: round1(
+        mean(entry.scores.flatMap((score) => AXES.map(({ key }) => score[key])))
+      ),
+    }))
+    .sort((a, b) => b.average - a.average)
+}
+
+const INSIGHT_ADVICE = {
+  Clarity: 'Shorter sentences and fewer filler words move this fastest.',
+  Confidence: 'Swap "I think" and "maybe" for what you actually did.',
+  STAR: 'Name the situation, your task, your actions, then the result.',
+}
+
+/**
+ * Plain-language observations, each traceable to a number on this page. Nothing
+ * here is generated by a model — it is the same data read out loud.
+ */
+export function deriveInsights(summary, sessions = [], now = new Date()) {
+  if (!summary.hasHistory) return []
+
+  const insights = []
+  const scored = chronological(sessions.filter((session) => session.responses?.length))
+  const sessionAverage = (session) =>
+    mean(session.responses.flatMap((response) => AXES.map(({ key }) => response[key])))
+
+  if (scored.length >= 2) {
+    const delta = round1(sessionAverage(scored.at(-1)) - sessionAverage(scored[0]))
+    insights.push(
+      delta >= 0
+        ? {
+            tone: 'up',
+            title: `Up ${delta.toFixed(1)} points since your first session`,
+            detail: `Your latest session averaged ${round1(sessionAverage(scored.at(-1))).toFixed(1)} of ${SCORE_MAX}.`,
+          }
+        : {
+            tone: 'focus',
+            title: `Down ${Math.abs(delta).toFixed(1)} points since your first session`,
+            detail: 'One weak session is normal — the trend over several matters more.',
+          }
+    )
+  }
+
+  const gap = round1(summary.strongest.value - summary.weakest.value)
+  insights.push({
+    tone: 'focus',
+    title: `${summary.weakest.label} is your weakest axis at ${summary.weakest.value.toFixed(1)}`,
+    detail:
+      gap > 0
+        ? `That is ${gap.toFixed(1)} below ${summary.strongest.label}. ${INSIGHT_ADVICE[summary.weakest.label] ?? ''}`
+        : (INSIGHT_ADVICE[summary.weakest.label] ?? ''),
+  })
+
+  const fortnight = dailyActivity(sessions, 14, now).filter((day) => day.answers > 0).length
+  insights.push({
+    tone: fortnight >= 7 ? 'up' : 'info',
+    title: `Practised ${fortnight} of the last 14 days`,
+    detail:
+      fortnight >= 7
+        ? 'Employers read consistency as preparation.'
+        : 'Short daily sessions build a stronger trend than occasional long ones.',
+  })
+
+  const roles = roleBreakdown(scored)
+  if (roles.length >= 2) {
+    insights.push({
+      tone: 'info',
+      title: `Strongest on ${roles[0].label} questions`,
+      detail: `You average ${roles[0].average.toFixed(1)} there against ${roles.at(-1).average.toFixed(1)} on ${roles.at(-1).label}.`,
+    })
+  }
+
+  return insights
 }
 
 /** Chunks daily activity into columns of seven days for the practice heatmap. */
@@ -318,7 +494,7 @@ export function deriveCredentials(summary) {
 
 export function deriveMilestones(summary, sessions = [], user = null) {
   const milestones = []
-  const scored = sessions.filter((session) => session.responses?.length)
+  const scored = chronological(sessions.filter((session) => session.responses?.length))
 
   if (summary.overall >= 4) {
     milestones.push({
