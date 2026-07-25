@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
@@ -15,9 +15,14 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    full_name: Mapped[str] = mapped_column(String(120))
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    target_role: Mapped[str] = mapped_column(String(120))
+    hashed_password: Mapped[str] = mapped_column(String(255))
+    full_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    education_level: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    industries: Mapped[list[str]] = mapped_column(JSON, default=list)
+    phone_number: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    languages: Mapped[list[str]] = mapped_column(JSON, default=list)
+    profile_completed: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     interview_sessions: Mapped[list["InterviewSession"]] = relationship(
