@@ -4,6 +4,7 @@ import { strings } from '../../i18n/en.js'
 import Button from '../common/Button.jsx'
 import HeroScene from './HeroScene.jsx'
 import Icon from './Icon.jsx'
+import HeroBackdrop from './hero3d/HeroBackdrop.jsx'
 
 export default function Hero() {
   const t = strings.landing.hero
@@ -22,6 +23,7 @@ export default function Hero() {
         aria-hidden="true"
         className="orb orb-accent float-slower pointer-events-none absolute -left-24 top-1/3 h-72 w-72"
       />
+      <HeroBackdrop />
 
       <div className="relative mx-auto grid max-w-7xl gap-14 px-4 py-16 md:py-24 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-20">
         <div className="rise-in">
