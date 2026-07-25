@@ -10,6 +10,14 @@ export const usingMockApi = import.meta.env.VITE_USE_MOCK_API !== 'false'
 
 const api = usingMockApi ? mockApi : httpApi
 
-export const { signup, login, fetchMe, completeProfile, fetchOptions } = api
+export const {
+  signup,
+  login,
+  fetchMe,
+  completeProfile,
+  fetchOptions,
+  requestPasswordReset,
+  resetPassword,
+} = api
 
 export { clearToken, getToken, setToken } from '../lib/token.js'

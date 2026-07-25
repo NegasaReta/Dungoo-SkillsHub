@@ -182,3 +182,61 @@ export async function fetchOptions() {
     languages: DEFAULT_OPTIONS.languages,
   }
 }
+
+const RESETS_KEY = 'dungoo.mock.resets'
+
+function readResets() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(RESETS_KEY) ?? '{}')
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
+/**
+ * Mirrors the real endpoint: the same answer for unknown emails, so the reply
+ * never reveals who has an account. The token is handed back directly because
+ * there is no inbox to send it to.
+ */
+export async function requestPasswordReset(email) {
+  await delay()
+
+  const normalizedEmail = email.trim().toLowerCase()
+  const message = 'If that email is registered, a password reset link is on its way.'
+  const user = readUsers().find((candidate) => candidate.email === normalizedEmail)
+  if (!user) return { message }
+
+  const token = `mock-reset-${Date.now().toString(36)}`
+  localStorage.setItem(RESETS_KEY, JSON.stringify({ ...readResets(), [token]: user.id }))
+
+  return {
+    message,
+    reset_token: token,
+    reset_url: `${window.location.origin}/reset-password?token=${token}`,
+  }
+}
+
+export async function resetPassword(token, newPassword) {
+  await delay()
+
+  const resets = readResets()
+  const userId = resets[token]
+  const users = readUsers()
+  const index = users.findIndex((candidate) => candidate.id === userId)
+  if (index === -1) {
+    throw new Error('This reset link is invalid or has expired. Request a new one.')
+  }
+
+  const strengthError = validatePasswordStrength(newPassword)
+  if (strengthError) throw new Error(strengthError)
+
+  users[index] = { ...users[index], password: newPassword }
+  writeUsers(users)
+
+  // Single use, exactly like the server's token.
+  delete resets[token]
+  localStorage.setItem(RESETS_KEY, JSON.stringify(resets))
+
+  return { message: 'Your password has been reset. You can log in now.' }
+}

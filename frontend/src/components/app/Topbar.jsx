@@ -1,16 +1,9 @@
-import { Link } from 'react-router-dom'
-
-import { useUser } from '../../context/UserContext.jsx'
+import HelpMenu from './HelpMenu.jsx'
 import NavIcon from './NavIcon.jsx'
-
-function initialsFor(user) {
-  const letters = [user?.first_name?.[0], user?.last_name?.[0]].filter(Boolean).join('')
-  return letters.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'
-}
+import NotificationsMenu from './NotificationsMenu.jsx'
+import ProfileMenu from './ProfileMenu.jsx'
 
 export default function Topbar({ onOpenSidebar }) {
-  const { user, logout } = useUser()
-
   return (
     <header className="sticky top-0 z-30 border-b border-primary/10 bg-white/90 backdrop-blur">
       <div className="flex items-center gap-3 px-4 py-3 sm:px-6">
@@ -51,35 +44,9 @@ export default function Topbar({ onOpenSidebar }) {
         </nav>
 
         <div className="ml-auto flex items-center gap-1 md:ml-0">
-          <button
-            type="button"
-            aria-label="Notifications"
-            className="rounded-lg p-2 text-primary/60 transition-colors hover:text-brand-blue"
-          >
-            <NavIcon name="bell" />
-          </button>
-          <button
-            type="button"
-            aria-label="Help"
-            className="rounded-lg p-2 text-primary/60 transition-colors hover:text-brand-blue"
-          >
-            <NavIcon name="help" />
-          </button>
-
-          <Link
-            to="/settings"
-            aria-label="Account settings"
-            className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-brand-blue text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          >
-            {initialsFor(user)}
-          </Link>
-          <button
-            type="button"
-            onClick={logout}
-            className="ml-1 hidden rounded-lg border border-primary/15 px-3 py-1.5 text-xs font-medium text-primary/70 transition-colors hover:text-primary sm:block"
-          >
-            Sign out
-          </button>
+          <NotificationsMenu />
+          <HelpMenu />
+          <ProfileMenu />
         </div>
       </div>
     </header>

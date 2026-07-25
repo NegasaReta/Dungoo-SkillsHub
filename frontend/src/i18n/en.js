@@ -3,6 +3,35 @@
  * added later without touching markup. Import `strings`, never inline copy.
  */
 export const strings = {
+  notifications: {
+    title: 'Notifications',
+    markAllRead: 'Mark all as read',
+    caughtUp: 'You are all caught up.',
+    signedOut: 'Log in to see your notifications.',
+    welcomeTitle: 'Welcome to Dungoo SkillsHub',
+    welcomeBody: 'Your account is ready. Practice interviews are scored on clarity, confidence, and STAR structure.',
+    profileTodoTitle: 'Finish your profile',
+    profileTodoBody: 'Add your education, industries, and languages so questions match your field.',
+    profileTodoAction: 'Complete profile',
+    profileDoneTitle: 'Your profile is complete',
+    profileDoneBody: 'Questions and scoring are now tailored to the industries you chose.',
+    practiceTitle: 'Ready for your first practice interview',
+    practiceBody: 'Answer one question at a time and get feedback immediately after each one.',
+    practiceAction: 'Start a session',
+  },
+  help: {
+    title: 'Help & support',
+    intro: 'Short answers to the things people ask first.',
+    practice: 'Practice an interview',
+    practiceBody: 'One question at a time, scored as you go.',
+    passport: 'Your Skill Passport',
+    passportBody: 'How your scores add up into one credential.',
+    howItWorks: 'How Dungoo works',
+    howItWorksBody: 'The three-step tour on our home page.',
+    account: 'Profile & account settings',
+    accountBody: 'Update your details or sign out.',
+    shortcut: 'Press Esc to close any menu.',
+  },
   interview: {
     setupTitle: 'Practice interview',
     setupBody: 'Pick the role you are preparing for. Questions are matched to it.',

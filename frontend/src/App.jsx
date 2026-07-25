@@ -4,8 +4,10 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import DemoModeBadge from './components/common/DemoModeBadge.jsx'
 import Loader from './components/common/Loader.jsx'
 import { UserProvider, useUser } from './context/UserContext.jsx'
+import ForgotPassword from './pages/ForgotPassword.jsx'
 import Landing from './pages/Landing.jsx'
 import Login from './pages/Login.jsx'
+import ResetPassword from './pages/ResetPassword.jsx'
 import Signup from './pages/Signup.jsx'
 
 // The signed-in app pulls in charting and the dashboard shell, so it is split
@@ -84,6 +86,23 @@ function AppRoutes() {
         element={
           <GuestOnly>
             <Login />
+          </GuestOnly>
+        }
+      />
+
+      <Route
+        path="/forgot-password"
+        element={
+          <GuestOnly>
+            <ForgotPassword />
+          </GuestOnly>
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          <GuestOnly>
+            <ResetPassword />
           </GuestOnly>
         }
       />
