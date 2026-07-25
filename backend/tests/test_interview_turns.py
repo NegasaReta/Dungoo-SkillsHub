@@ -188,6 +188,67 @@ def test_transcription_failure_never_leaks_config_details(client, session_id, mo
     assert "API_KEY" not in response.text
 
 
+def test_completing_without_a_body_still_ends_the_session(client, session_id):
+    # The engagement summary is optional all the way down: a client that sends no
+    # body at all, because the camera was off or tracking failed, must still be
+    # able to end its interview.
+    response = client.post(f"/interview/sessions/{session_id}/complete")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "completed"
+    assert response.json()["engagement_notes"] == []
+
+
+def test_engagement_comes_back_as_observations_not_a_score(client, session_id):
+    response = client.post(
+        f"/interview/sessions/{session_id}/complete",
+        json={
+            "engagement": {
+                "eye_contact": 0.82,
+                "head_stability": 0.79,
+                "expression_variety": 0.55,
+                "samples": 400,
+                "duration_seconds": 50.0,
+            }
+        },
+    )
+
+    assert response.status_code == 200
+    notes = response.json()["engagement_notes"]
+    assert notes and all(isinstance(note, str) for note in notes)
+    # Clarity, confidence, and STAR come from the transcript alone; nothing visual
+    # may ever surface as a number.
+    assert not any(character.isdigit() for note in notes for character in note)
+
+
+def test_thin_engagement_data_says_so_rather_than_guessing(client, session_id):
+    response = client.post(
+        f"/interview/sessions/{session_id}/complete",
+        json={
+            "engagement": {
+                "eye_contact": 1.0,
+                "head_stability": 1.0,
+                "expression_variety": 1.0,
+                "samples": 3,
+                "duration_seconds": 0.4,
+            }
+        },
+    )
+
+    assert response.json()["engagement_notes"] == [
+        "There was not enough video from this session to comment on your presence."
+    ]
+
+
+def test_engagement_ratios_outside_zero_to_one_are_rejected(client, session_id):
+    response = client.post(
+        f"/interview/sessions/{session_id}/complete",
+        json={"engagement": {"eye_contact": 1.4, "samples": 100}},
+    )
+
+    assert response.status_code == 422
+
+
 def test_another_users_session_is_invisible(client, session_id):
     intruder = _bearer(2)
 

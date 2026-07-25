@@ -11,13 +11,16 @@ from app.schemas.interview import (
     Question,
     ResponseSubmit,
     RoleOption,
+    SessionComplete,
     SessionCreate,
     SessionRead,
+    SessionSummaryRead,
     TurnAnswerRead,
     TurnQuestion,
 )
 from app.services import (
     ai_scoring,
+    engagement,
     lead_ins,
     passport_builder,
     question_bank,
@@ -235,27 +238,39 @@ def submit_response(
     return report
 
 
-@router.post("/sessions/{session_id}/complete", response_model=SessionRead)
+@router.post("/sessions/{session_id}/complete", response_model=SessionSummaryRead)
 def complete_session(
     session_id: int,
+    payload: SessionComplete | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> InterviewSession:
+) -> SessionSummaryRead:
     """Close the session, score its answers, and fold them into the passport.
 
     The session is marked complete before scoring runs, so a provider outage
     costs the candidate their feedback rather than the interview they just sat.
+
+    The body is optional so a client that sends none still ends its session, and
+    engagement within it is optional again for the camera-off case. What comes
+    back are observations, never a score — see services/engagement.py.
     """
     session = _owned_session(session_id, current_user, db)
     session.status = "completed"
     session.completed_at = utcnow()
+
+    if payload is not None and payload.engagement is not None:
+        session.engagement = payload.engagement.model_dump()
+
     db.commit()
 
     session_scoring.score_session(db, session)
     passport_builder.rebuild(db, current_user)
 
     db.refresh(session)
-    return session
+    return SessionSummaryRead(
+        **SessionRead.model_validate(session).model_dump(),
+        engagement_notes=engagement.describe(session.engagement),
+    )
 
 
 @router.get("/sessions/{session_id}/feedback", response_model=list[FeedbackRead])
