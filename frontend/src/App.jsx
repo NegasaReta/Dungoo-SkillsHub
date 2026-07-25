@@ -66,7 +66,7 @@ function GuestOnly({ children }) {
   return children
 }
 
-const PLACEHOLDER_ROUTES = [{ path: '/coach', title: 'AI Coach' }]
+const PLACEHOLDER_ROUTES = [{ path: '/coach', title: 'AI Communication' }]
 
 function AppRoutes() {
   return (

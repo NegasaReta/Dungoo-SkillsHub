@@ -4,7 +4,7 @@
  */
 export const NAV_ITEMS = [
   { to: '/dashboard', icon: 'dashboard', label: 'Dashboard', keywords: 'home overview progress' },
-  { to: '/coach', icon: 'coach', label: 'AI Coach', keywords: 'feedback practice communication' },
+  { to: '/coach', icon: 'coach', label: 'AI Communication', keywords: 'coach feedback practice communication' },
   { to: '/matching', icon: 'matching', label: 'Matching', keywords: 'peer language exchange partner' },
   { to: '/analytics', icon: 'analytics', label: 'Analytics', keywords: 'charts scores trends' },
   { to: '/resources', icon: 'resources', label: 'Resources', keywords: 'guides library reading' },
