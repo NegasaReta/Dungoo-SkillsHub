@@ -14,7 +14,8 @@ export default function NotificationsMenu() {
   function openNotification(item) {
     markRead(item.id)
     closeMenu()
-    navigate(item.to)
+    // Some notifications are informational and have nowhere to go.
+    if (item.to) navigate(item.to)
   }
 
   return (
@@ -57,45 +58,64 @@ export default function NotificationsMenu() {
             )}
           </div>
 
-          <ul className="max-h-80 overflow-y-auto py-1">
-            {items.map((item) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  onClick={() => openNotification(item)}
-                  className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-surface"
-                >
-                  <span
-                    className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                      item.read ? 'bg-surface text-primary/50' : 'bg-brand-blue/12 text-link'
-                    }`}
+          {items.length === 0 ? (
+            <p className="px-4 py-6 text-center text-sm text-primary/55">
+              {strings.notifications.signedOut}
+            </p>
+          ) : (
+            <ul className="max-h-80 overflow-y-auto py-1">
+              {items.map((item) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => openNotification(item)}
+                    className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-surface"
                   >
-                    <NavIcon name={item.icon} className="h-4 w-4" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-2">
-                      <span
-                        className={`truncate text-sm ${
-                          item.read ? 'text-primary/70' : 'font-semibold text-primary'
-                        }`}
-                      >
-                        {item.title}
+                    <span
+                      className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                        item.read
+                          ? 'bg-surface text-primary/50'
+                          : item.urgent
+                            ? 'bg-accent/20 text-primary'
+                            : 'bg-brand-blue/12 text-link'
+                      }`}
+                    >
+                      <NavIcon name={item.icon} className="h-4 w-4" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-2">
+                        <span
+                          className={`truncate text-sm ${
+                            item.read ? 'text-primary/70' : 'font-semibold text-primary'
+                          }`}
+                        >
+                          {item.title}
+                        </span>
+                        {!item.read && (
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                        )}
                       </span>
-                      {!item.read && (
-                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                      )}
+                      <span className="mt-0.5 block text-xs leading-relaxed text-primary/55">
+                        {item.body}
+                      </span>
+                      <span className="mt-1 flex items-center gap-2">
+                        {item.time && (
+                          <span className="text-[11px] text-primary/40">{item.time}</span>
+                        )}
+                        {item.action && (
+                          <span className="text-[11px] font-medium text-link">
+                            {item.action} &rarr;
+                          </span>
+                        )}
+                      </span>
                     </span>
-                    <span className="mt-0.5 block text-xs leading-relaxed text-primary/55">
-                      {item.body}
-                    </span>
-                    <span className="mt-1 block text-[11px] text-primary/40">{item.time}</span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
 
-          <div className="border-t border-primary/10 px-4 py-2.5">
+          <div className="flex items-center justify-between gap-3 border-t border-primary/10 px-4 py-2.5">
             <button
               type="button"
               onClick={() => {
@@ -106,6 +126,9 @@ export default function NotificationsMenu() {
             >
               {strings.notifications.viewAll}
             </button>
+            {items.length > 0 && unreadCount === 0 && (
+              <p className="text-xs text-primary/50">{strings.notifications.empty}</p>
+            )}
           </div>
         </MenuPanel>
       )}

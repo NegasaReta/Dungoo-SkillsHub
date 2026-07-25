@@ -10,7 +10,8 @@ class Question(BaseModel):
 
 
 class SessionCreate(BaseModel):
-    user_id: int
+    """Role only — the signed-in user comes from the JWT, not the request body."""
+
     role: str
 
 

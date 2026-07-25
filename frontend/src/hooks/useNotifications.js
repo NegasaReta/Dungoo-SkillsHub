@@ -1,51 +1,46 @@
 import { useCallback, useMemo, useState } from 'react'
 
-import { notificationFeed } from '../data/notifications.js'
-
-const READ_KEY = 'dungoo.notifications.read'
-
-function readIds() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(READ_KEY) ?? '[]')
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
-  }
-}
-
-function persist(ids) {
-  try {
-    localStorage.setItem(READ_KEY, JSON.stringify(ids))
-  } catch {
-    // Read state is a convenience only; ignore storage failures.
-  }
-}
+import { useUser } from '../context/UserContext.jsx'
+import { buildNotifications, markAllRead as persistAllRead, markRead as persistRead } from '../lib/notifications.js'
+import { relativeTime } from '../lib/time.js'
 
 /**
- * Read state is kept in localStorage because the app shell (and therefore the
- * topbar) remounts on every route change.
+ * Notifications are derived from the signed-in account rather than a static
+ * feed, so nothing is shown that is not true of this user. Read state lives in
+ * localStorage because the app shell, and therefore the topbar, remounts on
+ * every route change.
  */
 export function useNotifications() {
-  const [readIdList, setReadIdList] = useState(readIds)
-
-  const markAllRead = useCallback(() => {
-    const ids = notificationFeed.map((item) => item.id)
-    setReadIdList(ids)
-    persist(ids)
-  }, [])
-
-  const markRead = useCallback((id) => {
-    setReadIdList((current) => {
-      if (current.includes(id)) return current
-      const next = [...current, id]
-      persist(next)
-      return next
-    })
-  }, [])
+  const { user } = useUser()
+  // Bumped after a write so the derived list recomputes from storage.
+  const [readVersion, setReadVersion] = useState(0)
 
   const items = useMemo(
-    () => notificationFeed.map((item) => ({ ...item, read: readIdList.includes(item.id) })),
-    [readIdList]
+    () =>
+      buildNotifications(user).map((item) => ({
+        ...item,
+        read: !item.unread,
+        time: relativeTime(item.at),
+      })),
+    [user, readVersion]
+  )
+
+  const markAllRead = useCallback(() => {
+    if (!user) return
+    persistAllRead(
+      user.id,
+      items.map((item) => item.id)
+    )
+    setReadVersion((current) => current + 1)
+  }, [user, items])
+
+  const markRead = useCallback(
+    (id) => {
+      if (!user) return
+      persistRead(user.id, id)
+      setReadVersion((current) => current + 1)
+    },
+    [user]
   )
 
   return {

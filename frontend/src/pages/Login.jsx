@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import AuthCard from '../components/auth/AuthCard.jsx'
 import FormAlert from '../components/auth/FormAlert.jsx'
@@ -11,6 +11,8 @@ import { validateEmail } from '../lib/validation.js'
 export default function Login() {
   const { login } = useUser()
   const navigate = useNavigate()
+  // Set when arriving straight from a completed password reset.
+  const notice = useLocation().state?.notice
 
   const [form, setForm] = useState({ email: '', password: '' })
   const [fieldErrors, setFieldErrors] = useState({})
@@ -59,6 +61,7 @@ export default function Login() {
       }
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
+        {notice && !formError && <FormAlert tone="success">{notice}</FormAlert>}
         <FormAlert>{formError}</FormAlert>
 
         <TextField
@@ -72,16 +75,26 @@ export default function Login() {
           onChange={(event) => updateField('email', event.target.value)}
         />
 
-        <TextField
-          id="password"
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          placeholder="••••••••"
-          value={form.password}
-          error={fieldErrors.password}
-          onChange={(event) => updateField('password', event.target.value)}
-        />
+        <div>
+          <TextField
+            id="password"
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            value={form.password}
+            error={fieldErrors.password}
+            onChange={(event) => updateField('password', event.target.value)}
+          />
+          <div className="mt-1.5 text-right">
+            <Link
+              to="/forgot-password"
+              className="text-xs font-medium text-brand-blue hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
+        </div>
 
         <Button type="submit" variant="accent" disabled={submitting} className="w-full py-3">
           {submitting ? 'Logging in…' : 'Log in'}

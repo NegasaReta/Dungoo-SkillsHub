@@ -232,8 +232,22 @@ export const strings = {
     title: 'Notifications',
     markAllRead: 'Mark all as read',
     empty: 'You are all caught up.',
+    signedOut: 'Log in to see your notifications.',
     unreadCount: '{count} unread',
     viewAll: 'View all activity',
+    welcomeTitle: 'Welcome to Dungoo SkillsHub',
+    welcomeBody:
+      'Your account is ready. Practice interviews are scored on clarity, confidence, and STAR structure.',
+    profileTodoTitle: 'Finish your profile',
+    profileTodoBody:
+      'Add your education, industries, and languages so questions match your field.',
+    profileTodoAction: 'Complete profile',
+    profileDoneTitle: 'Your profile is complete',
+    profileDoneBody: 'Questions and scoring are now tailored to the industries you chose.',
+    practiceTitle: 'Ready for your first practice interview',
+    practiceBody:
+      'Answer one question at a time and get feedback immediately after each one.',
+    practiceAction: 'Start a session',
   },
 
   settings: {
