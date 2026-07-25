@@ -26,7 +26,7 @@ export default function Navbar() {
           : 'border-transparent bg-panel/40 backdrop-blur'
       }`}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3">
         <Link to="/" className="flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-blue font-bold text-white shadow-md shadow-brand-blue/25">
             D
