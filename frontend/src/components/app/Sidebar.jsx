@@ -1,6 +1,6 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 
-import { NAV_ITEMS, QUICK_ACTIONS } from '../../data/navigation.js'
+import { NAV_ITEMS } from '../../data/navigation.js'
 import NavIcon from './NavIcon.jsx'
 
 export default function Sidebar({ onNavigate }) {
@@ -20,30 +20,6 @@ export default function Sidebar({ onNavigate }) {
       <nav className="mt-8 flex-1">
         <ul className="space-y-1">
           {NAV_ITEMS.map((item) => (
-            <li key={item.to}>
-              <NavLink
-                to={item.to}
-                onClick={onNavigate}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
-                    isActive
-                      ? 'bg-brand-blue font-medium text-white'
-                      : 'text-primary/70 hover:bg-surface hover:text-primary'
-                  }`
-                }
-              >
-                <NavIcon name={item.icon} />
-                {item.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-
-        <p className="mt-6 px-3 text-[10px] font-semibold uppercase tracking-widest text-primary/45">
-          Practice
-        </p>
-        <ul className="mt-2 space-y-1">
-          {QUICK_ACTIONS.map((item) => (
             <li key={item.to}>
               <NavLink
                 to={item.to}
