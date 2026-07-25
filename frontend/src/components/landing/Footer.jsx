@@ -7,7 +7,7 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-primary/10 bg-panel">
-      <div className="mx-auto max-w-6xl px-4 py-12">
+      <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="flex flex-col justify-between gap-8 md:flex-row">
           <div className="max-w-sm">
             <div className="flex items-center gap-2">
