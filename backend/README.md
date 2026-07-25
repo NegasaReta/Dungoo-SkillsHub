@@ -96,8 +96,24 @@ python scripts/acceptance_check.py            # defaults to http://127.0.0.1:800
 | `POST` | `/auth/signup` | Create user (email/password), return JWT |
 | `POST` | `/auth/login` | Verify credentials, return JWT |
 | `GET` | `/auth/me` | Current user (Bearer token) |
+| `POST` | `/auth/forgot-password` | Issue a password reset link |
+| `POST` | `/auth/reset-password` | Set a new password from a reset token |
 | `POST` | `/profile/complete` | Save onboarding profile fields |
 | `GET` | `/meta/options` | Allowed education / industry / language values |
+
+### Password reset
+
+`/auth/forgot-password` answers identically whether or not the email is registered, so
+it cannot be used to discover who has an account. A request stores a single-use token
+(only its SHA-256 hash is persisted, in `password_reset_tokens`), retires any earlier
+unused token for that user, and expires after `RESET_TOKEN_EXPIRE_MINUTES`.
+
+There is no email provider wired up yet. The reset link is written to the server log,
+which is where it should stay in a deployment. For local testing,
+`DEV_EXPOSE_RESET_TOKEN=true` also returns the token in the response and the frontend
+shows a "continue" link — **this must stay false anywhere reachable from the internet**,
+since it would let anyone reset any account. Swapping the log line in
+`app/routers/auth.py` for a real mail call is the only change needed to go live.
 
 ### Name and phone handling
 

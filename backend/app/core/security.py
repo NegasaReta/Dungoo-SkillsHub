@@ -1,3 +1,5 @@
+import hashlib
+import secrets
 from datetime import datetime, timedelta, timezone
 
 from fastapi import Depends, HTTPException, status
@@ -20,6 +22,16 @@ def hash_password(password: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
+
+
+def generate_reset_token() -> str:
+    """The value that travels in the reset link; only its hash is persisted."""
+    return secrets.token_urlsafe(32)
+
+
+def hash_reset_token(token: str) -> str:
+    # A random 256-bit token needs no salt or key stretching, unlike a password.
+    return hashlib.sha256(token.encode()).hexdigest()
 
 
 def create_access_token(subject: str | int) -> str:

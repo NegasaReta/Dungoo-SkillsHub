@@ -12,6 +12,14 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
+    RESET_TOKEN_EXPIRE_MINUTES: int = 30
+    # Where the reset link points, i.e. the frontend origin.
+    FRONTEND_URL: str = "http://localhost:5173"
+    # Local convenience only: returns the reset token in the API response so the
+    # flow can be walked without an email provider. Anyone who can call the
+    # endpoint could then take over any account, so this must stay false in
+    # anything reachable from the internet.
+    DEV_EXPOSE_RESET_TOKEN: bool = False
     # Comma-separated list, or "*" for open local-dev CORS (lock down before deploy).
     CORS_ORIGINS: str = "*"
 

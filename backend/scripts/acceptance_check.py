@@ -196,6 +196,65 @@ with httpx.Client(base_url=BASE_URL, timeout=15.0) as client:
     )
     check("17. Implausible phone number -> 422", r.status_code == 422, r.status_code)
 
+    # Password reset. Needs DEV_EXPOSE_RESET_TOKEN=true to read the token back;
+    # otherwise it is only written to the server log.
+    r = client.post("/auth/forgot-password", json={"email": fe_email})
+    body = r.json()
+    reset_token = body.get("reset_token")
+    check(
+        "18. Forgot password for a known email -> 200",
+        r.status_code == 200 and bool(body.get("message")),
+        r.status_code,
+    )
+
+    unknown = client.post(
+        "/auth/forgot-password",
+        json={"email": f"ghost.{uuid.uuid4().hex[:8]}@example.com"},
+    )
+    check(
+        "19. Unknown email answers identically (no account enumeration)",
+        unknown.status_code == 200 and unknown.json().get("message") == body.get("message"),
+        unknown.status_code,
+    )
+
+    if not reset_token:
+        check(
+            "20-23. Reset token checks (needs DEV_EXPOSE_RESET_TOKEN=true)",
+            False,
+            "no reset_token returned",
+        )
+    else:
+        r = client.post(
+            "/auth/reset-password", json={"token": reset_token, "new_password": "short"}
+        )
+        check("20. Reset with a short password -> 422", r.status_code == 422, r.status_code)
+
+        r = client.post(
+            "/auth/reset-password",
+            json={"token": reset_token, "new_password": "Rotated!pass1"},
+        )
+        check("21. Reset with a valid token -> 200", r.status_code == 200, r.status_code)
+
+        r = client.post(
+            "/auth/login", json={"email": fe_email, "password": "Rotated!pass1"}
+        )
+        check("22. Login with the new password -> 200", r.status_code == 200, r.status_code)
+
+        r = client.post("/auth/login", json={"email": fe_email, "password": "Str0ng!pass"})
+        check("23. Old password no longer works -> 401", r.status_code == 401, r.status_code)
+
+        r = client.post(
+            "/auth/reset-password",
+            json={"token": reset_token, "new_password": "Another!pass1"},
+        )
+        check("24. Reset token cannot be reused -> 400", r.status_code == 400, r.status_code)
+
+    r = client.post(
+        "/auth/reset-password",
+        json={"token": "not-a-real-token", "new_password": "Whatever!pass1"},
+    )
+    check("25. Made-up reset token -> 400", r.status_code == 400, r.status_code)
+
 print()
 if failures:
     print(f"{len(failures)} check(s) failed: {failures}")

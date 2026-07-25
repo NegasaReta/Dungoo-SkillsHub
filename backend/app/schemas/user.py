@@ -95,6 +95,39 @@ class TokenResponse(BaseModel):
     profile_completed: bool
 
 
+class ForgotPasswordRequest(BaseModel):
+    model_config = ConfigDict(json_schema_extra={"example": {"email": "abebe@example.com"}})
+
+    email: EmailStr
+
+
+class ForgotPasswordResponse(BaseModel):
+    """Deliberately says the same thing whether or not the email is registered.
+
+    reset_token and reset_url are only filled in when DEV_EXPOSE_RESET_TOKEN is
+    on, so the flow can be tested without an email provider.
+    """
+
+    message: str
+    reset_token: str | None = None
+    reset_url: str | None = None
+
+
+class ResetPasswordRequest(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {"token": "paste-the-token-from-the-reset-link", "new_password": "N3w!password"}
+        }
+    )
+
+    token: str = Field(min_length=1)
+    new_password: str = Field(min_length=8)
+
+
+class MessageResponse(BaseModel):
+    message: str
+
+
 class ProfileCompleteRequest(NamedRequest):
     model_config = ConfigDict(
         json_schema_extra={
