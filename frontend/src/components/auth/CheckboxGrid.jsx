@@ -14,8 +14,8 @@ export default function CheckboxGrid({ legend, hint, options, selected, onToggle
               key={value}
               className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
                 checked
-                  ? 'border-brand-blue bg-brand-blue/10 text-primary'
-                  : 'border-primary/15 text-primary/70 hover:border-primary/30'
+                  ? 'border-brand-blue bg-brand-blue/15 text-primary'
+                  : 'border-primary/15 text-primary/70 hover:border-primary/30 hover:bg-surface'
               }`}
             >
               <input
@@ -30,7 +30,7 @@ export default function CheckboxGrid({ legend, hint, options, selected, onToggle
         })}
       </div>
 
-      {error && <p className="mt-1.5 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1.5 text-xs text-danger">{error}</p>}
     </fieldset>
   )
 }

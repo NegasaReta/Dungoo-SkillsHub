@@ -52,7 +52,7 @@ export default function Login() {
       footer={
         <>
           New to Dungoo SkillsHub?{' '}
-          <Link to="/signup" className="font-medium text-brand-blue hover:underline">
+          <Link to="/signup" className="font-medium text-link hover:underline">
             Create an account
           </Link>
         </>
