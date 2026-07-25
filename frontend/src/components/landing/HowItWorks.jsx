@@ -12,10 +12,10 @@ export default function HowItWorks() {
         className="orb orb-blue pointer-events-none absolute -right-32 top-10 h-72 w-72"
       />
 
-      <div className="relative mx-auto max-w-6xl px-4">
-        <Reveal className="max-w-2xl">
+      <div className="relative mx-auto max-w-7xl px-4">
+        <Reveal className="max-w-4xl">
           <p className="font-medium text-link">{t.eyebrow}</p>
-          <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">{t.title}</h2>
+          <h2 className="mt-2 text-3xl font-bold text-primary md:text-5xl">{t.title}</h2>
         </Reveal>
 
         <ol className="relative mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -35,8 +35,8 @@ export default function HowItWorks() {
                   <span className="depth-2 flex h-11 w-11 items-center justify-center rounded-xl bg-accent font-bold text-navy shadow-lg shadow-accent/30">
                     {index + 1}
                   </span>
-                  <h3 className="mt-5 text-lg font-semibold text-primary">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-primary/70">{step.body}</p>
+                  <h3 className="mt-5 text-xl font-semibold text-primary">{step.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-primary/70">{step.body}</p>
                 </TiltCard>
               </Reveal>
             </li>

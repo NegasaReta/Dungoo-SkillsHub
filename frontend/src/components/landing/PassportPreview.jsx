@@ -24,15 +24,15 @@ export default function PassportPreview() {
         className="orb orb-blue pointer-events-none absolute -right-24 top-1/4 h-80 w-80"
       />
 
-      <div className="relative mx-auto grid max-w-6xl gap-14 px-4 lg:grid-cols-2 lg:items-center">
+      <div className="relative mx-auto grid max-w-7xl gap-14 px-4 lg:grid-cols-2 lg:items-center lg:gap-20">
         <Reveal>
           <p className="font-medium text-link">{t.eyebrow}</p>
-          <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">{t.title}</h2>
-          <p className="mt-4 leading-relaxed text-primary/70">{t.body}</p>
+          <h2 className="mt-2 text-3xl font-bold text-primary md:text-5xl">{t.title}</h2>
+          <p className="mt-5 text-lg leading-relaxed text-primary/70">{t.body}</p>
 
           <ul className="mt-8 space-y-4">
             {t.benefits.map((benefit) => (
-              <li key={benefit} className="flex gap-3 text-primary/80">
+              <li key={benefit} className="flex gap-3 text-base text-primary/80">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent">
                   <Icon name="check" className="h-3.5 w-3.5" />
                 </span>

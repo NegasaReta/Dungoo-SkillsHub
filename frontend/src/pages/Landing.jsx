@@ -7,6 +7,7 @@ import HowItWorks from '../components/landing/HowItWorks.jsx'
 import Navbar from '../components/landing/Navbar.jsx'
 import PassportPreview from '../components/landing/PassportPreview.jsx'
 import ProblemStats from '../components/landing/ProblemStats.jsx'
+import SessionShowcase from '../components/landing/SessionShowcase.jsx'
 
 export default function Landing() {
   return (
@@ -16,6 +17,7 @@ export default function Landing() {
         <Hero />
         <ProblemStats />
         <HowItWorks />
+        <SessionShowcase />
         <FeatureGrid />
         <PassportPreview />
         <Differentiators />

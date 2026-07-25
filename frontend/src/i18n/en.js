@@ -111,6 +111,19 @@ export const strings = {
       ],
     },
 
+    showcase: {
+      eyebrow: 'Inside a session',
+      title: 'Your answer, scored while it is still fresh',
+      body: 'You answer one question at a time on camera. The AI reads the answer back to you: how clearly you spoke, how confident you sounded, and whether the story followed the STAR structure employers listen for.',
+      points: [
+        'Clarity and confidence scored from your own answer, not a generic template.',
+        'Feedback in seconds, so you can retry while the question is still fresh.',
+        'Every completed session adds to the Skill Passport you can share.',
+      ],
+      caption: 'Illustration of a practice session being scored.',
+      alt: 'A candidate answering an interview question, with panels around her showing a clarity waveform, an AI score, and badges being added to a Skill Passport.',
+    },
+
     features: {
       eyebrow: 'Features',
       title: 'One integrated platform, not another single-purpose app',
