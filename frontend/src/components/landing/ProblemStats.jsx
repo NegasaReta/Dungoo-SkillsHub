@@ -19,12 +19,12 @@ export default function ProblemStats() {
         className="orb orb-blue float-slow pointer-events-none absolute -left-16 bottom-0 h-64 w-64"
       />
 
-      <div className="relative mx-auto max-w-6xl px-4">
-        <Reveal className="max-w-2xl">
-          <h2 className="text-3xl font-bold md:text-4xl">
+      <div className="relative mx-auto max-w-7xl px-4">
+        <Reveal className="max-w-4xl">
+          <h2 className="text-3xl font-bold md:text-5xl">
             {t.title} <span className="text-accent">{t.titleAccent}</span>.
           </h2>
-          <p className="mt-4 leading-relaxed text-white/70">{t.body}</p>
+          <p className="mt-5 text-lg leading-relaxed text-white/70">{t.body}</p>
         </Reveal>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-3">
@@ -34,9 +34,9 @@ export default function ProblemStats() {
                 max={6}
                 className="sheen rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur hover:border-accent/40"
               >
-                <p className="depth-1 text-4xl font-bold text-accent">{stat.value}</p>
-                <p className="mt-2 font-medium">{stat.label}</p>
-                <p className="mt-1 text-sm text-white/60">{stat.detail}</p>
+                <p className="depth-1 text-4xl font-bold text-accent md:text-5xl">{stat.value}</p>
+                <p className="mt-2 text-lg font-medium">{stat.label}</p>
+                <p className="mt-1 text-base text-white/60">{stat.detail}</p>
               </TiltCard>
             </Reveal>
           ))}
