@@ -5,6 +5,7 @@ import { strings } from '../../i18n/en.js'
 export default function CallControls({
   micOn,
   cameraOn,
+  hasCamera = true,
   captionsOn,
   onToggleMic,
   onToggleCamera,
@@ -25,9 +26,10 @@ export default function CallControls({
       />
       <RoundButton
         icon={cameraOn ? 'camera' : 'cameraOff'}
-        label={cameraOn ? t.cameraOffAction : t.cameraOnAction}
+        label={hasCamera ? (cameraOn ? t.cameraOffAction : t.cameraOnAction) : t.cameraUnavailableAction}
         active={cameraOn}
         onClick={onToggleCamera}
+        disabled={!hasCamera}
       />
       <RoundButton
         icon="captions"
@@ -49,18 +51,21 @@ export default function CallControls({
   )
 }
 
-function RoundButton({ icon, label, active, onClick }) {
+function RoundButton({ icon, label, active, onClick, disabled = false }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       title={label}
       aria-label={label}
       aria-pressed={active}
       className={`inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors ${
-        active
-          ? 'bg-white/10 text-white hover:bg-white/20'
-          : 'bg-accent text-primary hover:bg-accent/90'
+        disabled
+          ? 'cursor-not-allowed bg-white/5 text-white/30'
+          : active
+            ? 'bg-white/10 text-white hover:bg-white/20'
+            : 'bg-accent text-primary hover:bg-accent/90'
       }`}
     >
       <CallIcon name={icon} />

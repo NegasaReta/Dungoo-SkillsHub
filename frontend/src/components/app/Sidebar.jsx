@@ -1,13 +1,14 @@
 import { Link, NavLink } from 'react-router-dom'
 
-import { NAV_ITEMS, QUICK_ACTIONS } from '../../data/navigation.js'
+import { NAV_ITEMS } from '../../data/navigation.js'
 import { strings } from '../../i18n/en.js'
 import NavIcon from './NavIcon.jsx'
 
 /*
- * Each group carries its own brand colour so the two halves of the nav read
- * apart at a glance. Gold only ever appears as a fill or an icon here — as
- * label text on a light panel it would fall under 4.5:1.
+ * Colour is what sets the two practice destinations apart now that they sit in
+ * the one list: they carry `tone: 'accent'` in the registry, everything else
+ * reads blue. Gold only ever appears as a fill or an icon — as label text on a
+ * light panel it would fall under 4.5:1.
  */
 const TONES = {
   brand: {
@@ -20,45 +21,6 @@ const TONES = {
     idle: 'text-primary/70 hover:bg-accent/15 hover:text-primary',
     icon: 'text-accent',
   },
-}
-
-function NavGroup({ title, items, tone, onNavigate }) {
-  const palette = TONES[tone]
-
-  return (
-    <div>
-      <p className="flex items-center gap-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-link">
-        {title}
-        <span aria-hidden="true" className="h-px flex-1 bg-primary/10" />
-      </p>
-      <ul className="mt-2 space-y-1">
-        {items.map((item) => (
-          <li key={item.to}>
-            {/* NavLink marks the active route with aria-current for us. */}
-            <NavLink
-              to={item.to}
-              onClick={onNavigate}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
-                  isActive ? palette.active : palette.idle
-                } focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <NavIcon
-                    name={item.icon}
-                    className={`h-5 w-5 ${isActive ? '' : palette.icon}`}
-                  />
-                  {item.label}
-                </>
-              )}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
 }
 
 export default function Sidebar({ onNavigate }) {
@@ -81,14 +43,37 @@ export default function Sidebar({ onNavigate }) {
         </span>
       </Link>
 
-      <nav className="mt-8 flex-1 space-y-6">
-        <NavGroup title={t.groupMain} items={NAV_ITEMS} tone="brand" onNavigate={onNavigate} />
-        <NavGroup
-          title={t.groupPractice}
-          items={QUICK_ACTIONS}
-          tone="accent"
-          onNavigate={onNavigate}
-        />
+      <nav className="mt-8 flex-1">
+        <ul className="space-y-1">
+          {NAV_ITEMS.map((item) => {
+            const palette = TONES[item.tone === 'accent' ? 'accent' : 'brand']
+
+            return (
+              <li key={item.to}>
+                {/* NavLink marks the active route with aria-current for us. */}
+                <NavLink
+                  to={item.to}
+                  onClick={onNavigate}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
+                      isActive ? palette.active : palette.idle
+                    } focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <NavIcon
+                        name={item.icon}
+                        className={`h-5 w-5 ${isActive ? '' : palette.icon}`}
+                      />
+                      {item.label}
+                    </>
+                  )}
+                </NavLink>
+              </li>
+            )
+          })}
+        </ul>
       </nav>
 
       {/* The primary action of the product, kept in reach from every page. */}

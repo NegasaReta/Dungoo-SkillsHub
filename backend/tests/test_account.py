@@ -127,9 +127,9 @@ def test_changing_the_password_needs_a_token(session_factory):
         json={"current_password": PASSWORD, "new_password": NEW_PASSWORD},
     )
 
-    # 403 rather than 401: the shared bearer dependency answers that way when the
-    # Authorization header is missing altogether.
-    assert response.status_code == 403
+    # get_current_user answers a missing header itself, so "no token" and "bad
+    # token" both come back 401.
+    assert response.status_code == 401
 
 
 def test_a_password_change_retires_a_pending_reset_link(client, session_factory):

@@ -10,7 +10,7 @@ export default function CallToAction() {
 
   return (
     <section className="bg-canvas py-16 md:py-24">
-      <Reveal className="mx-auto max-w-7xl px-4">
+      <Reveal className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="sheen relative overflow-hidden rounded-3xl bg-navy px-6 py-14 text-center shadow-2xl shadow-navy/25 md:px-16">
           <div aria-hidden="true" className="scene-3d pointer-events-none absolute inset-0">
             <div className="grid-floor-inverse absolute inset-x-0 bottom-0 h-72" />
@@ -25,8 +25,8 @@ export default function CallToAction() {
           />
 
           <div className="relative">
-            <h2 className="text-3xl font-bold text-white md:text-5xl">{t.title}</h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/70">{t.body}</p>
+            <h2 className="text-3xl font-bold text-white md:text-4xl">{t.title}</h2>
+            <p className="mx-auto mt-4 max-w-xl leading-relaxed text-white/70">{t.body}</p>
 
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Button

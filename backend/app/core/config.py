@@ -47,6 +47,7 @@ class Settings(BaseSettings):
     INTERVIEW_GENERATE_LEAD_INS: bool = True
     # Hard cap so the conversation cannot run unbounded and the demo stays predictable.
     INTERVIEW_MAX_TURNS: int = 5
+
     # Comma-separated list, or "*" for open local-dev CORS (lock down before deploy).
     CORS_ORIGINS: str = "*"
 

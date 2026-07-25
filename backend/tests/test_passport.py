@@ -199,7 +199,7 @@ def _sit_interview(client, answers=1):
 
 
 def test_passport_requires_a_token():
-    assert TestClient(app).get("/passport/me").status_code == 403
+    assert TestClient(app).get("/passport/me").status_code == 401
 
 
 def test_a_new_candidate_gets_an_empty_passport_not_a_404(client):

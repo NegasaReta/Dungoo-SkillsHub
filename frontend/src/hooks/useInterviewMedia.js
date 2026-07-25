@@ -1,11 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { classifyMediaError } from '../lib/mediaErrors.js'
+
+const AUDIO = { echoCancellation: true, noiseSuppression: true }
+const VIDEO = { width: { ideal: 640 }, facingMode: 'user' }
+
 /**
  * Owns the camera + mic for the whole call, the way a meeting client would.
  *
  * The camera feeds the on-screen self-view and the on-device engagement model
  * only. Recording is deliberately built from the audio tracks alone, so no video
  * ever reaches a Blob and there is nothing to upload but speech.
+ *
+ * Which is why the camera is not allowed to block the interview: a blocked
+ * webcam costs the candidate their self-view and the closing presence notes,
+ * while a blocked mic costs them the interview itself. Only the second is fatal,
+ * so the two devices are requested together and then separately, rather than in
+ * one call that fails as a unit.
  */
 export default function useInterviewMedia() {
   const streamRef = useRef(null)
@@ -18,27 +29,46 @@ export default function useInterviewMedia() {
   const [seconds, setSeconds] = useState(0)
   const [micOn, setMicOn] = useState(true)
   const [cameraOn, setCameraOn] = useState(true)
+  const [hasCamera, setHasCamera] = useState(true)
+  // Why the camera is missing, when the call is running without one.
+  const [cameraFault, setCameraFault] = useState(null)
   const [error, setError] = useState(null)
+
+  const adopt = useCallback((media) => {
+    streamRef.current = media
+    setStream(media)
+    setMicOn(true)
+
+    const video = media.getVideoTracks().length > 0
+    setHasCamera(video)
+    setCameraOn(video)
+    return media
+  }, [])
 
   const open = useCallback(async () => {
     setError(null)
+    setCameraFault(null)
     if (streamRef.current) return streamRef.current
 
     try {
-      const media = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true },
-        video: { width: { ideal: 640 }, facingMode: 'user' },
-      })
-      streamRef.current = media
-      setStream(media)
-      setMicOn(true)
-      setCameraOn(true)
-      return media
+      return adopt(
+        await navigator.mediaDevices.getUserMedia({ audio: AUDIO, video: VIDEO })
+      )
     } catch (cause) {
-      setError(cause)
-      throw cause
+      // One request cannot say which device refused, so the mic is asked for on
+      // its own. If that works, the camera was the problem and the call goes on.
+      try {
+        const voiceOnly = adopt(
+          await navigator.mediaDevices.getUserMedia({ audio: AUDIO })
+        )
+        setCameraFault(classifyMediaError(cause))
+        return voiceOnly
+      } catch (micCause) {
+        setError(micCause)
+        throw micCause
+      }
     }
-  }, [])
+  }, [adopt])
 
   const startAnswer = useCallback(async () => {
     setError(null)
@@ -119,7 +149,9 @@ export default function useInterviewMedia() {
     streamRef.current?.getTracks().forEach((track) => track.stop())
     streamRef.current = null
     setStream(null)
-    setError(null)
+    // The error deliberately survives: joining tears the call down before it
+    // reports the failure, and clearing here left the screen with nothing to
+    // explain but the browser's raw message. `open` resets it on the next try.
   }, [clearAnswer])
 
   useEffect(() => {
@@ -137,6 +169,8 @@ export default function useInterviewMedia() {
     seconds,
     micOn,
     cameraOn,
+    hasCamera,
+    cameraFault,
     error,
     open,
     startAnswer,

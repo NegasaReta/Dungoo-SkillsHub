@@ -114,7 +114,7 @@ export default function Dashboard() {
       {/* Mobile only: on wide screens the sidebar keeps the same action in view. */}
       <Link
         to="/interview"
-        aria-label="Start AI Interview"
+        aria-label="Start a mock interview"
         className="group fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/40 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue lg:hidden"
       >
         <span

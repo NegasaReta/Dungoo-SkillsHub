@@ -5,13 +5,16 @@ import { format, strings } from '../../i18n/en.js'
 export default function Footer() {
   const t = strings.landing.footer
 
+  // `navy` stays dark in both themes, so the ink here is white rather than
+  // `text-primary`, which inverts with the theme.
   return (
-    // `navy` stays dark in both themes, so the ink here is white rather than
-    // `text-primary` (which inverts).
     <footer className="bg-navy text-white">
-      <div aria-hidden="true" className="h-1 bg-gradient-to-r from-brand-blue via-accent to-brand-blue" />
+      <div
+        aria-hidden="true"
+        className="h-1 bg-gradient-to-r from-brand-blue via-accent to-brand-blue"
+      />
 
-      <div className="mx-auto max-w-7xl px-4 py-12">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col justify-between gap-8 md:flex-row">
           <div className="max-w-sm">
             <div className="flex items-center gap-2">

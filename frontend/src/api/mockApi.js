@@ -63,10 +63,12 @@ function publicUser(user) {
 
 const tokenFor = (user) => `${TOKEN_PREFIX}${user.id}`
 
-/** Id of the signed-in mock user, or null. Shared with the mock interview store. */
+/** Id of the signed-in mock user, or null. Shared with the mock interview store.
+ *  Integer, like the real API returns, so ids never need special-casing by mode. */
 export function currentUserId() {
   const token = getToken()
   if (!token?.startsWith(TOKEN_PREFIX)) return null
+
   const id = Number(token.slice(TOKEN_PREFIX.length))
   return Number.isInteger(id) ? id : null
 }

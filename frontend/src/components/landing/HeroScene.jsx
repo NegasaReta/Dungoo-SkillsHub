@@ -1,3 +1,4 @@
+import heroInterview from '../../assets/hero-interview.jpg'
 import { SCORE_MAX } from '../../constants.js'
 import useTilt from '../../hooks/useTilt.js'
 import { strings } from '../../i18n/en.js'
@@ -10,10 +11,11 @@ const SAMPLE_SCORES = [
 ]
 
 /**
- * The hero's 3D centrepiece: a mock-interview card that tilts toward the
- * pointer, with score chips floating in front of it on separate Z planes.
- * Everything is CSS transforms — no 3D library, and it degrades to a flat card
- * on touch screens and for reduced-motion users.
+ * The hero's 3D centrepiece: a mock-interview card showing the camera frame, the
+ * question, and its live scores. It tilts toward the pointer, with score chips
+ * floating in front of it on separate Z planes. The depth is all CSS transforms —
+ * no 3D library — and it degrades to a flat card on touch screens and for
+ * reduced-motion users.
  */
 export default function HeroScene() {
   const t = strings.landing.hero
@@ -45,17 +47,24 @@ export default function HeroScene() {
         />
 
         <div className="spotlight sheen relative rounded-3xl border border-primary/10 bg-panel p-6 shadow-2xl shadow-navy/20 sm:p-7">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-primary/60">{t.cardQuestion}</span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-primary">
+          <div className="relative overflow-hidden rounded-2xl border border-primary/10 bg-surface">
+            <img
+              src={heroInterview}
+              alt={t.cardImageAlt}
+              width="1024"
+              height="683"
+              className="block aspect-video w-full object-cover"
+            />
+            <span className="absolute right-3 top-3 inline-flex items-center gap-2 rounded-full bg-navy/70 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
               <span className="h-2 w-2 animate-pulse rounded-full bg-accent" />
               {t.cardRecording}
             </span>
           </div>
 
-          <p className="mt-4 text-lg leading-snug text-primary">{t.cardPrompt}</p>
+          <p className="mt-5 text-sm text-primary/60">{t.cardQuestion}</p>
+          <p className="mt-2 text-lg leading-snug text-primary">{t.cardPrompt}</p>
 
-          <div className="mt-6 space-y-4">
+          <div className="mt-5 space-y-3">
             {SAMPLE_SCORES.map((score) => (
               <div key={score.key}>
                 <div className="flex items-center justify-between text-sm">
@@ -75,7 +84,7 @@ export default function HeroScene() {
             ))}
           </div>
 
-          <p className="mt-6 rounded-xl bg-surface p-4 text-sm leading-relaxed text-primary/70">
+          <p className="mt-5 rounded-xl bg-surface p-3.5 text-sm leading-relaxed text-primary/70">
             {t.cardFeedback}
           </p>
         </div>
