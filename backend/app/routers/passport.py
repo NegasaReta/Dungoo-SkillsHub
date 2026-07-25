@@ -25,7 +25,7 @@ def rebuild_passport(user_id: int, db: Session = Depends(get_db)) -> SkillPasspo
     )
 
     passport = user.passport or SkillPassport(user_id=user_id)
-    passport.role = user.target_role
+    passport.role = (user.industries[0] if user.industries else "general")
     passport.scores = aggregate_scores(reports)
     passport.sessions_completed = len(completed)
 
