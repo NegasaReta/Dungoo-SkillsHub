@@ -1,4 +1,4 @@
-const SCORE_MAX = 5
+import { SCORE_MAX } from '../../constants.js'
 
 const SKILLS = [
   { label: 'Clarity', value: 4.2 },

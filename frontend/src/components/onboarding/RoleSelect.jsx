@@ -9,8 +9,8 @@ export default function RoleSelect({ roles = [], value, onChange }) {
         Select a role
       </option>
       {roles.map((role) => (
-        <option key={role} value={role}>
-          {role}
+        <option key={role.slug} value={role.slug}>
+          {role.label}
         </option>
       ))}
     </select>

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 import Button from '../common/Button.jsx'
 
-const SCORE_MAX = 5
+import { SCORE_MAX } from '../../constants.js'
 
 const SAMPLE_SCORES = [
   { label: 'Clarity', value: 4.2 },
