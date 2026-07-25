@@ -78,6 +78,25 @@ The same flow, plus the failure cases, runs headlessly against a live server:
 python scripts/acceptance_check.py            # defaults to http://127.0.0.1:8000
 ```
 
+### Checking the live providers
+
+`pytest` stubs every provider, so a green suite says nothing about whether the keys in
+`.env` still work. Two scripts call them for real:
+
+```bash
+python scripts/provider_check.py    # one call to each provider; needs no server
+python scripts/interview_check.py   # a whole interview against a running server
+```
+
+`provider_check.py` round-trips a sentence — spoken by the TTS provider, handed back to
+the STT provider — so a pass means the two halves agree on an audio format rather than
+that both returned 200. `interview_check.py` then sits a full interview: it speaks a
+written STAR answer, uploads it as the recording, and fails unless the transcript,
+scores, engagement notes, and passport all come back populated.
+
+Worth running before a demo. A wrong or exhausted key is invisible until a candidate is
+mid-session, and both scripts cost a handful of API calls.
+
 ## Environment variables
 
 | Variable | Purpose | Default |
@@ -89,6 +108,28 @@ python scripts/acceptance_check.py            # defaults to http://127.0.0.1:800
 | `SECRET_KEY` | JWT signing secret | `change-me` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT lifetime in minutes | `10080` (7 days) |
 | `CORS_ORIGINS` | Comma-separated origins, or `*` for local dev | `*` |
+
+### Voice providers
+
+These stay server-side. Vite inlines any `VITE_*` variable into the public bundle, so
+the frontend reaches these providers through this API rather than holding the keys.
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `TTS_PROVIDER` | Who speaks the questions: `elevenlabs` or `gemini` | `elevenlabs` |
+| `STT_PROVIDER` | Who transcribes answers: `elevenlabs` or `addis` | `elevenlabs` |
+| `ELEVENLABS_API_KEY` | Speech in both directions | empty |
+| `ELEVENLABS_VOICE_ID` | Which voice the interviewer uses | `JBFqnCBsd6RMkjVDRZzb` |
+| `ELEVENLABS_TTS_MODEL` / `ELEVENLABS_STT_MODEL` | ElevenLabs model ids | `eleven_multilingual_v2` / `scribe_v1` |
+| `ADDIS_AI_API_KEY` | Addis AI, trained on Amharic and Afan Oromo | empty |
+| `GEMINI_TTS_MODEL` / `GEMINI_TTS_VOICE` | Used when `TTS_PROVIDER=gemini`, on `LLM_API_KEY` | `gemini-2.5-flash-preview-tts` / `Kore` |
+| `INTERVIEW_LANGUAGE` | Default answer language | `en` |
+| `INTERVIEW_MAX_TURNS` | Questions per interview | `5` |
+
+Neither choice is binding. Each provider covers for the other when its key is missing
+*or* when a live call fails, because free-tier quotas tend to run out partway through a
+session and a silent interviewer is the one failure a candidate cannot work around.
+Addis AI takes Amharic and Afan Oromo whatever `STT_PROVIDER` says.
 
 ## Auth & onboarding endpoints
 
@@ -135,8 +176,12 @@ so `0912345678`, `912345678`, `251912345678`, and `+251912345678` all persist as
 
 | Method | Path | Purpose |
 | --- | --- | --- |
+| `GET` | `/interview/roles` | Roles the question bank covers |
 | `GET` | `/interview/questions?role=` | Question bank for a role |
 | `POST` | `/interview/sessions` | Start a session |
+| `POST` | `/interview/sessions/{id}/turns/next` | Issue the next question |
+| `GET` | `/interview/sessions/{id}/turns/{index}/audio` | That question as spoken audio |
+| `POST` | `/interview/sessions/{id}/turns/{index}/answer` | Upload a recording, get its transcript |
 | `POST` | `/interview/sessions/{id}/responses` | Submit a transcript and get scored |
 | `POST` | `/interview/sessions/{id}/complete` | Finish a session, score its answers, update the passport |
 | `GET` | `/interview/sessions/{id}/feedback` | All feedback for a session |
