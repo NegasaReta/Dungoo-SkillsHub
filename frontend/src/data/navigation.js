@@ -28,6 +28,16 @@ export const QUICK_ACTIONS = [
 
 const SEARCHABLE = [...QUICK_ACTIONS, ...NAV_ITEMS]
 
+/**
+ * The destination a path belongs to, so the topbar can name the current page.
+ * Longest match wins, so a nested route still resolves to its section.
+ */
+export function destinationFor(pathname) {
+  return SEARCHABLE.filter(
+    (item) => pathname === item.to || pathname.startsWith(`${item.to}/`)
+  ).sort((a, b) => b.to.length - a.to.length)[0]
+}
+
 export function searchDestinations(query) {
   const term = query.trim().toLowerCase()
   if (!term) return []

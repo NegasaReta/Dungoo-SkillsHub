@@ -55,7 +55,8 @@ export default function Dashboard() {
 
   return (
     <AppShell>
-      <div className="space-y-5">
+      {/* Bottom padding keeps the floating button off the last card on mobile. */}
+      <div className="space-y-5 pb-20 lg:pb-0">
         {!profileCompleted && <ProfileBanner />}
 
         {loading ? (
@@ -110,10 +111,11 @@ export default function Dashboard() {
         )}
       </div>
 
+      {/* Mobile only: on wide screens the sidebar keeps the same action in view. */}
       <Link
         to="/interview"
         aria-label="Start AI Interview"
-        className="group fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/40 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
+        className="group fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/40 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue lg:hidden"
       >
         <span
           aria-hidden="true"

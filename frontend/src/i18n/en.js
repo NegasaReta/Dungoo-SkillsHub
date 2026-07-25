@@ -238,14 +238,26 @@ export const strings = {
     description: 'Choose how Dungoo SkillsHub looks. System follows your device setting.',
   },
 
+  sidebar: {
+    groupMain: 'Overview',
+    groupPractice: 'Practice',
+    ctaTitle: 'Ready to practise?',
+    ctaBody: 'One mock interview takes about ten minutes and updates your Skill Passport.',
+    ctaAction: 'Start AI Interview',
+  },
+
   topbar: {
-    searchLabel: 'Search skills, coaches, or lessons',
-    searchPlaceholder: 'Search skills, coaches, or lessons...',
-    searchEmpty: 'No matches yet. Try “interview”, “passport”, or “analytics”.',
+    // The search jumps between pages and actions, so the copy says that rather
+    // than promising coaches and lessons it cannot find.
+    searchLabel: 'Search pages and actions',
+    searchPlaceholder: 'Jump to a page or action…',
+    searchEmpty: 'Nothing matches. Try “interview”, “passport”, or “analytics”.',
+    searchHint: 'Use the arrow keys to choose, Enter to open.',
+    searchResults: 'Search results',
     openNavigation: 'Open navigation',
     closeNavigation: 'Close navigation',
-    explore: 'Explore',
-    community: 'Community',
+    navigation: 'Main navigation',
+    skipToContent: 'Skip to main content',
     help: 'Help and shortcuts',
     account: 'Account menu',
   },
@@ -258,6 +270,7 @@ export const strings = {
     shortcutsTitle: 'Handy to know',
     shortcuts: [
       'Recordings never leave your device — only the answer text is scored.',
+      'Press Ctrl+K (⌘K on Mac) to jump to any page.',
       'Press Esc to close any menu.',
       'Switch between light and dark from your profile menu.',
     ],
