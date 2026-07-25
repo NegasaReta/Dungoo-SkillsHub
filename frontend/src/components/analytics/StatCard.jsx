@@ -3,6 +3,7 @@ import Panel from '../dashboard/Panel.jsx'
 
 export default function StatCard({ icon, label, value, suffix, changePercent, hint }) {
   const positive = changePercent >= 0
+  const showChange = typeof changePercent === 'number'
 
   return (
     <Panel className="flex items-center gap-4">
@@ -10,21 +11,26 @@ export default function StatCard({ icon, label, value, suffix, changePercent, hi
         <NavIcon name={icon} className="h-5 w-5" />
       </span>
 
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-xs text-primary/60">{label}</p>
-        <div className="mt-1 flex items-baseline gap-1.5">
+        <div className="mt-0.5 flex items-baseline gap-1.5">
           <span className="text-2xl font-bold text-primary">{value}</span>
           {suffix && <span className="text-xs text-primary/50">{suffix}</span>}
-          {typeof changePercent === 'number' && changePercent !== 0 && (
-            <span
-              className={`text-[11px] font-medium ${positive ? 'text-success' : 'text-red-600'}`}
-            >
-              {positive ? '▲' : '▼'} {Math.abs(changePercent)}%
-            </span>
-          )}
         </div>
         {hint && <p className="mt-0.5 truncate text-[11px] text-primary/45">{hint}</p>}
       </div>
+
+      {showChange && (
+        <span
+          // Gold rather than red for a dip: the palette has no danger colour, and a
+          // quiet week is not an error.
+          className={`shrink-0 self-start text-[11px] font-semibold ${
+            changePercent === 0 ? 'text-primary/40' : positive ? 'text-success' : 'text-accent'
+          }`}
+        >
+          {changePercent === 0 ? '–' : positive ? '↗' : '↘'} {Math.abs(changePercent)}%
+        </span>
+      )}
     </Panel>
   )
 }
