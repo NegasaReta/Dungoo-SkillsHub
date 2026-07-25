@@ -1,87 +1,77 @@
 import { Link } from 'react-router-dom'
 
+import { strings } from '../../i18n/en.js'
 import Button from '../common/Button.jsx'
-
-import { SCORE_MAX } from '../../constants.js'
-
-const SAMPLE_SCORES = [
-  { label: 'Clarity', value: 4.2 },
-  { label: 'Confidence', value: 3.6 },
-  { label: 'STAR structure', value: 4.5 },
-]
+import HeroScene from './HeroScene.jsx'
+import Icon from './Icon.jsx'
 
 export default function Hero() {
+  const t = strings.landing.hero
+
   return (
-    <section className="bg-surface">
-      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 md:py-24 lg:grid-cols-2 lg:items-center">
-        <div>
-          <span className="inline-flex items-center gap-2 rounded-full bg-brand-blue/10 px-3 py-1 text-sm text-brand-blue">
-            Built in Ethiopia, for Ethiopian youth
+    <section className="relative overflow-hidden bg-canvas">
+      {/* Perspective horizon behind the content. */}
+      <div aria-hidden="true" className="scene-3d pointer-events-none absolute inset-0">
+        <div className="grid-floor absolute inset-x-0 bottom-0 h-[420px]" />
+      </div>
+      <div
+        aria-hidden="true"
+        className="orb orb-blue pointer-events-none absolute -top-40 left-1/2 h-[26rem] w-[46rem] -translate-x-1/2"
+      />
+      <div
+        aria-hidden="true"
+        className="orb orb-accent float-slower pointer-events-none absolute -left-24 top-1/3 h-72 w-72"
+      />
+
+      <div className="relative mx-auto grid max-w-6xl gap-14 px-4 py-16 md:py-24 lg:grid-cols-2 lg:items-center">
+        <div className="rise-in">
+          <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm text-link shadow-sm">
+            <Icon name="globe" className="h-4 w-4" />
+            {t.badge}
           </span>
 
-          <h1 className="mt-5 text-4xl font-bold leading-tight text-primary md:text-5xl">
-            Your qualifications are ready.
-            <span className="text-brand-blue"> Now get your confidence there too.</span>
+          <h1 className="mt-5 text-4xl font-bold leading-[1.1] text-primary md:text-6xl">
+            {t.titleLead}
+            <span className="mt-2 block bg-gradient-to-r from-link via-brand-blue to-accent bg-clip-text text-transparent">
+              {t.titleAccent}
+            </span>
           </h1>
 
-          <p className="mt-5 max-w-xl text-lg text-primary/70">
-            Dungoo SkillsHub is an AI-powered career readiness platform. Practice real interviews on
-            camera, get scored on clarity, confidence, and STAR structure in seconds, and turn every
-            session into a Skill Passport employers can trust.
-          </p>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-primary/70">{t.body}</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button as={Link} to="/signup" variant="accent" className="px-6 py-3">
-              Start a mock interview
+            <Button
+              as={Link}
+              to="/signup"
+              variant="accent"
+              className="gap-2 px-6 py-3 shadow-lg shadow-accent/25 transition-transform hover:-translate-y-0.5"
+            >
+              <Icon name="play" className="h-4 w-4" />
+              {t.primaryCta}
             </Button>
-            <Button as="a" href="#how-it-works" variant="outline" className="px-6 py-3">
-              See how it works
+            <Button
+              as="a"
+              href="#how-it-works"
+              variant="outline"
+              className="gap-2 px-6 py-3 transition-transform hover:-translate-y-0.5"
+            >
+              {t.secondaryCta}
+              <Icon name="arrow" className="h-4 w-4" />
             </Button>
           </div>
 
-          <p className="mt-6 text-sm text-primary/60">
-            Free to start · Works on low-bandwidth connections · Amharic, Afaan Oromoo, Tigrinya
-            &amp; English
-          </p>
+          <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-primary/60">
+            {t.trust.map((item) => (
+              <li key={item} className="inline-flex items-center gap-1.5">
+                <Icon name="check" className="h-4 w-4 text-success" />
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div className="rounded-2xl border border-primary/10 bg-white p-6 shadow-lg">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-primary/60">Question 2 of 5</span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-primary">
-              <span className="h-2 w-2 rounded-full bg-accent" />
-              Recording
-            </span>
-          </div>
-
-          <p className="mt-4 text-lg text-primary">
-            “Tell me about a problem you solved that others on your team had missed.”
-          </p>
-
-          <div className="mt-6 space-y-4">
-            {SAMPLE_SCORES.map((score) => (
-              <div key={score.label}>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-primary/70">{score.label}</span>
-                  <span className="font-semibold text-primary">
-                    {score.value.toFixed(1)}
-                    <span className="font-normal text-primary/50"> / {SCORE_MAX}</span>
-                  </span>
-                </div>
-                <div className="mt-1.5 h-2 rounded-full bg-surface">
-                  <div
-                    className="h-2 rounded-full bg-accent"
-                    style={{ width: `${(score.value / SCORE_MAX) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-6 rounded-lg bg-surface p-4 text-sm text-primary/70">
-            Strong result and a clear outcome. Next time, name the specific metric you improved so
-            the impact lands faster.
-          </p>
+        <div className="rise-in lg:pl-4">
+          <HeroScene />
         </div>
       </div>
     </section>

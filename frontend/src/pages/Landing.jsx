@@ -10,7 +10,7 @@ import ProblemStats from '../components/landing/ProblemStats.jsx'
 
 export default function Landing() {
   return (
-    <div className="bg-white">
+    <div className="bg-panel">
       <Navbar />
       <main>
         <Hero />
