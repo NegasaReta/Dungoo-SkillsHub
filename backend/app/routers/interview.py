@@ -5,6 +5,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.security import get_current_user
 from app.db.database import get_db
 from app.db.models import FeedbackReport, InterviewSession, User, utcnow
 from app.schemas.interview import (
@@ -33,6 +34,13 @@ def get_question(role: str, question_id: str) -> dict:
     raise HTTPException(status.HTTP_404_NOT_FOUND, "Question not found for this role")
 
 
+def _owned_session(session_id: int, user: User, db: Session) -> InterviewSession:
+    session = db.get(InterviewSession, session_id)
+    if session is None or session.user_id != user.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Session not found")
+    return session
+
+
 @router.get("/questions", response_model=list[Question])
 def list_questions(role: str) -> list[dict]:
     questions = load_questions().get(role)
@@ -42,11 +50,15 @@ def list_questions(role: str) -> list[dict]:
 
 
 @router.post("/sessions", response_model=SessionRead, status_code=status.HTTP_201_CREATED)
-def create_session(payload: SessionCreate, db: Session = Depends(get_db)) -> InterviewSession:
-    if db.get(User, payload.user_id) is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found")
+def create_session(
+    payload: SessionCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> InterviewSession:
+    if payload.role not in load_questions():
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No question bank for this role")
 
-    session = InterviewSession(user_id=payload.user_id, role=payload.role)
+    session = InterviewSession(user_id=current_user.id, role=payload.role)
     db.add(session)
     db.commit()
     db.refresh(session)
@@ -59,11 +71,12 @@ def create_session(payload: SessionCreate, db: Session = Depends(get_db)) -> Int
     status_code=status.HTTP_201_CREATED,
 )
 def submit_response(
-    session_id: int, payload: ResponseSubmit, db: Session = Depends(get_db)
+    session_id: int,
+    payload: ResponseSubmit,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> FeedbackReport:
-    session = db.get(InterviewSession, session_id)
-    if session is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Session not found")
+    session = _owned_session(session_id, current_user, db)
 
     question = get_question(session.role, payload.question_id)
     scores = ai_scoring.score_answer(session.role, question["text"], payload.transcript)
@@ -86,10 +99,12 @@ def submit_response(
 
 
 @router.post("/sessions/{session_id}/complete", response_model=SessionRead)
-def complete_session(session_id: int, db: Session = Depends(get_db)) -> InterviewSession:
-    session = db.get(InterviewSession, session_id)
-    if session is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Session not found")
+def complete_session(
+    session_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> InterviewSession:
+    session = _owned_session(session_id, current_user, db)
 
     session.status = "completed"
     session.completed_at = utcnow()
@@ -99,8 +114,9 @@ def complete_session(session_id: int, db: Session = Depends(get_db)) -> Intervie
 
 
 @router.get("/sessions/{session_id}/feedback", response_model=list[FeedbackRead])
-def list_feedback(session_id: int, db: Session = Depends(get_db)) -> list[FeedbackReport]:
-    session = db.get(InterviewSession, session_id)
-    if session is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Session not found")
-    return session.reports
+def list_feedback(
+    session_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list[FeedbackReport]:
+    return _owned_session(session_id, current_user, db).reports
