@@ -1,211 +1,365 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import AppShell from '../components/app/AppShell.jsx'
 import Button from '../components/common/Button.jsx'
 import Card from '../components/common/Card.jsx'
 import Loader from '../components/common/Loader.jsx'
-import ConsentGate from '../components/interview/ConsentGate.jsx'
-import LiveFeedback from '../components/interview/LiveFeedback.jsx'
-import QuestionCard from '../components/interview/QuestionCard.jsx'
-import RecorderControls from '../components/interview/RecorderControls.jsx'
-import TranscriptInput from '../components/interview/TranscriptInput.jsx'
-import VideoPreview from '../components/interview/VideoPreview.jsx'
-import RoleSelect from '../components/onboarding/RoleSelect.jsx'
-import useMediaRecorder from '../hooks/useMediaRecorder.js'
-import { completeSession, createSession, fetchQuestions, submitResponse } from '../api/index.js'
-import { useUser } from '../context/UserContext.jsx'
+import CallControls from '../components/interview/CallControls.jsx'
+import CallStage from '../components/interview/CallStage.jsx'
+import CaptionRail from '../components/interview/CaptionRail.jsx'
+import RoomLobby from '../components/interview/RoomLobby.jsx'
+import {
+  completeSession,
+  createSession,
+  fetchNextTurn,
+  fetchRoles,
+  submitTurnAnswer,
+} from '../api/interview.js'
 import { ROLES } from '../constants.js'
+import { useUser } from '../context/UserContext.jsx'
+import useEngagementTracker from '../hooks/useEngagementTracker.js'
+import useInterviewMedia from '../hooks/useInterviewMedia.js'
+import useQuestionAudio from '../hooks/useQuestionAudio.js'
+import useVoiceActivity from '../hooks/useVoiceActivity.js'
 import { strings } from '../i18n/en.js'
 
 const PHASES = {
-  setup: 'setup',
-  consent: 'consent',
-  loading: 'loading',
-  answering: 'answering',
-  feedback: 'feedback',
-  complete: 'complete',
-  declined: 'declined',
+  lobby: 'lobby',
+  joining: 'joining',
+  speaking: 'speaking',
+  listening: 'listening',
+  transcribing: 'transcribing',
+  ending: 'ending',
+  ended: 'ended',
+}
+
+function displayName(user, fallback) {
+  return [user?.first_name, user?.last_name].filter(Boolean).join(' ') || fallback
 }
 
 export default function InterviewSession() {
   const t = strings.interview
-  const { user } = useUser()
+  const { user, isAuthenticated } = useUser()
 
-  const [phase, setPhase] = useState(PHASES.setup)
+  const [phase, setPhase] = useState(PHASES.lobby)
+  const [roles, setRoles] = useState(ROLES)
   const [role, setRole] = useState(ROLES[0].slug)
-  const [session, setSession] = useState(null)
-  const [questions, setQuestions] = useState([])
-  const [index, setIndex] = useState(0)
-  const [transcript, setTranscript] = useState('')
-  const [feedback, setFeedback] = useState(null)
+  const [turn, setTurn] = useState(null)
+  const [captions, setCaptions] = useState([])
+  const [captionsOn, setCaptionsOn] = useState(true)
+  const [notes, setNotes] = useState([])
   const [error, setError] = useState(null)
 
-  const recorder = useMediaRecorder({ audio: true, video: true })
-  const question = questions[index]
-  const isLastQuestion = index === questions.length - 1
+  const {
+    stream,
+    micOn,
+    cameraOn,
+    error: mediaError,
+    open: openMedia,
+    startAnswer,
+    stopAnswer,
+    toggleMic,
+    toggleCamera,
+    close: closeMedia,
+  } = useInterviewMedia()
+  const {
+    isLoading: audioLoading,
+    error: audioError,
+    play: playQuestion,
+    revoke: revokeQuestion,
+  } = useQuestionAudio()
+  const { start: startEngagement, stop: stopEngagement, reset: resetEngagement } =
+    useEngagementTracker()
 
-  const beginSession = useCallback(async () => {
-    setPhase(PHASES.loading)
-    setError(null)
-    try {
-      const [bank, created] = await Promise.all([
-        fetchQuestions(role),
-        createSession({ userId: user?.id, role }),
-      ])
-      setQuestions(bank)
-      setSession(created)
-      setIndex(0)
-      setPhase(PHASES.answering)
-    } catch (cause) {
-      setError(cause)
-      setPhase(PHASES.setup)
-    }
-  }, [role, user?.id])
+  // The mic hands the turn back on its own, so the handler is reached through a
+  // ref: it is defined after the steps it triggers.
+  const onSilenceRef = useRef(null)
+  const { level, isSpeaking, start: startVoice, stop: stopVoice } = useVoiceActivity({
+    onSilence: () => onSilenceRef.current?.(),
+  })
 
-  const submit = useCallback(async () => {
-    if (!transcript.trim()) {
-      setError(new Error(t.errorNoTranscript))
-      return
-    }
+  // Audio and mic events can outlive the call; they check these before acting.
+  const liveRef = useRef(false)
+  const sessionRef = useRef(null)
+  const turnRef = useRef(null)
 
-    setPhase(PHASES.loading)
-    setError(null)
-    try {
-      const report = await submitResponse(session.id, {
-        questionId: question.id,
-        transcript: transcript.trim(),
+  const say = useCallback((id, speaker, text, pending = false) => {
+    setCaptions((current) => {
+      const entry = { id, speaker, text, pending }
+      const index = current.findIndex((item) => item.id === id)
+      if (index === -1) return [...current, entry]
+      const next = [...current]
+      next[index] = entry
+      return next
+    })
+  }, [])
+
+  const drop = useCallback((id) => {
+    setCaptions((current) => current.filter((entry) => entry.id !== id))
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchRoles()
+      .then((list) => {
+        if (cancelled || !list?.length) return
+        setRoles(list)
+        setRole((current) =>
+          list.some((item) => item.slug === current) ? current : list[0].slug
+        )
       })
-      setFeedback(report)
-      setPhase(PHASES.feedback)
+      .catch(() => {
+        // Keep the local ROLES fallback when the roles endpoint is not up yet.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const openMic = useCallback(async () => {
+    if (!liveRef.current) return
+    try {
+      await startAnswer()
+      setPhase(PHASES.listening)
     } catch (cause) {
       setError(cause)
-      setPhase(PHASES.answering)
     }
-  }, [question, session, transcript, t.errorNoTranscript])
+  }, [startAnswer])
 
-  const goNext = useCallback(async () => {
-    recorder.reset()
-    setTranscript('')
-    setFeedback(null)
+  const askQuestion = useCallback(
+    async (sessionId) => {
+      try {
+        const next = await fetchNextTurn(sessionId)
+        if (!liveRef.current) return
 
-    if (!isLastQuestion) {
-      setIndex((value) => value + 1)
-      setPhase(PHASES.answering)
+        turnRef.current = next
+        setTurn(next)
+        setPhase(PHASES.speaking)
+        say(`question-${next.turn_index}`, 'interviewer', next.text)
+
+        // The mic opens when the interviewer stops talking.
+        playQuestion(sessionId, next.turn_index, { onEnded: openMic })
+      } catch (cause) {
+        setError(cause)
+      }
+    },
+    [openMic, playQuestion, say]
+  )
+
+  const leaveRoom = useCallback(async () => {
+    // Also stops a second click from completing the session twice.
+    if (!liveRef.current) return
+    liveRef.current = false
+    setPhase(PHASES.ending)
+
+    stopVoice()
+    revokeQuestion()
+    // The whole session's video, reduced to a handful of ratios, sent once.
+    const engagement = stopEngagement()
+
+    try {
+      if (sessionRef.current) {
+        const finished = await completeSession(sessionRef.current.id, engagement)
+        setNotes(finished?.engagement_notes ?? [])
+      }
+    } catch (cause) {
+      setError(cause)
+    } finally {
+      closeMedia()
+      setPhase(PHASES.ended)
+    }
+  }, [closeMedia, revokeQuestion, stopEngagement, stopVoice])
+
+  /** Send the answer for transcription, caption it, then keep the call moving. */
+  const submitAnswer = useCallback(async () => {
+    const current = turnRef.current
+    const session = sessionRef.current
+    if (!liveRef.current || !current || !session) return
+
+    const captionId = `answer-${current.turn_index}`
+    setPhase(PHASES.transcribing)
+    say(captionId, 'candidate', '', true)
+
+    const recording = await stopAnswer()
+    if (!recording) {
+      setError(new Error(t.errorNoRecording))
+      drop(captionId)
       return
     }
 
-    setPhase(PHASES.loading)
     try {
-      await completeSession(session.id)
-      setPhase(PHASES.complete)
-    } catch (cause) {
-      setError(cause)
-      setPhase(PHASES.feedback)
+      const answer = await submitTurnAnswer(session.id, current.turn_index, recording)
+      say(captionId, 'candidate', answer.transcript)
+    } catch {
+      // Losing one transcript should not end the conversation, and the reason is
+      // for the server log, not for the candidate mid-interview.
+      setError(new Error(t.errorTranscription))
+      drop(captionId)
     }
-  }, [isLastQuestion, recorder, session])
 
-  const restart = useCallback(() => {
-    recorder.reset()
-    setSession(null)
-    setQuestions([])
-    setIndex(0)
-    setTranscript('')
-    setFeedback(null)
+    if (!liveRef.current) return
+    if (current.is_final) await leaveRoom()
+    else await askQuestion(session.id)
+  }, [askQuestion, drop, leaveRoom, say, stopAnswer, t.errorNoRecording, t.errorTranscription])
+
+  useEffect(() => {
+    onSilenceRef.current = submitAnswer
+  }, [submitAnswer])
+
+  const joinRoom = useCallback(async () => {
+    if (!isAuthenticated) {
+      setError(new Error(t.errorNotSignedIn))
+      return
+    }
+
     setError(null)
-    setPhase(PHASES.setup)
-  }, [recorder])
+    setCaptions([])
+    setPhase(PHASES.joining)
+
+    try {
+      const media = await openMedia()
+      startEngagement(media)
+
+      // Session is bound to the JWT user on the backend — no client user_id.
+      const created = await createSession({ role })
+      sessionRef.current = created
+      liveRef.current = true
+
+      await askQuestion(created.id)
+    } catch (cause) {
+      liveRef.current = false
+      closeMedia()
+      resetEngagement()
+      setError(cause)
+      setPhase(PHASES.lobby)
+    }
+  }, [
+    askQuestion,
+    closeMedia,
+    isAuthenticated,
+    openMedia,
+    resetEngagement,
+    role,
+    startEngagement,
+    t.errorNotSignedIn,
+  ])
+
+  const backToLobby = useCallback(() => {
+    sessionRef.current = null
+    turnRef.current = null
+    setTurn(null)
+    setCaptions([])
+    setNotes([])
+    setError(null)
+    setPhase(PHASES.lobby)
+  }, [])
+
+  // Silence detection is on only while it is the candidate's turn and they are
+  // unmuted, so a muted mic holds the turn open instead of ending it.
+  useEffect(() => {
+    if (phase === PHASES.listening && micOn && stream) startVoice(stream)
+    else stopVoice()
+  }, [micOn, phase, startVoice, stopVoice, stream])
+
+  useEffect(
+    () => () => {
+      liveRef.current = false
+    },
+    []
+  )
+
+  const inRoom =
+    phase === PHASES.speaking ||
+    phase === PHASES.listening ||
+    phase === PHASES.transcribing ||
+    phase === PHASES.ending
+
+  const status = {
+    [PHASES.speaking]: audioLoading ? t.loadingAudio : t.speaking,
+    [PHASES.listening]: micOn ? t.listening : t.micMuted,
+    [PHASES.transcribing]: t.transcribing,
+    [PHASES.ending]: t.wrappingUp,
+  }[phase]
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-3xl space-y-5">
-        <header>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-link">
-            {t.pageEyebrow}
-          </p>
-          <h1 className="mt-1 text-3xl font-bold text-primary">{t.pageTitle}</h1>
-          <p className="mt-2 text-sm text-primary/60">{t.pageSubtitle}</p>
-        </header>
+      <div className="mx-auto max-w-4xl space-y-6">
+        {error && <ErrorNotice error={error} cameraError={mediaError} />}
 
-        {error && <ErrorNotice error={error} cameraError={recorder.error} />}
+        {phase === PHASES.lobby && (
+          <RoomLobby
+            roles={roles}
+            role={role}
+            onRoleChange={setRole}
+            onJoin={joinRoom}
+            onCancel={backToLobby}
+          />
+        )}
 
-        {phase === PHASES.setup && (
+        {phase === PHASES.joining && (
           <Card className="mx-auto max-w-xl">
-            <h1 className="text-xl font-semibold text-primary">{t.setupTitle}</h1>
-            <p className="mt-2 text-primary/70">{t.setupBody}</p>
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-              <RoleSelect roles={ROLES} value={role} onChange={setRole} />
-              <Button variant="accent" onClick={() => setPhase(PHASES.consent)}>
-                {t.setupStart}
-              </Button>
-            </div>
+            <Loader label={t.joining} />
           </Card>
         )}
 
-        {phase === PHASES.consent && (
-          <ConsentGate onAccept={beginSession} onDecline={() => setPhase(PHASES.declined)} />
+        {inRoom && (
+          <div className="space-y-5 rounded-3xl bg-primary p-4 sm:p-6">
+            <CallStage
+              turn={turn}
+              status={status}
+              interviewerSpeaking={phase === PHASES.speaking}
+              candidateName={displayName(user, t.youName)}
+              stream={stream}
+              cameraOn={cameraOn}
+              micOn={micOn}
+              candidateSpeaking={phase === PHASES.listening && isSpeaking}
+              level={level}
+            />
+
+            {audioError && <p className="text-xs text-white/50">{t.voiceUnavailable}</p>}
+
+            {captionsOn && <CaptionRail entries={captions} />}
+
+            <CallControls
+              micOn={micOn}
+              cameraOn={cameraOn}
+              captionsOn={captionsOn}
+              onToggleMic={toggleMic}
+              onToggleCamera={toggleCamera}
+              onToggleCaptions={() => setCaptionsOn((value) => !value)}
+              onLeave={leaveRoom}
+              leaveLabel={phase === PHASES.ending ? t.wrappingUp : undefined}
+              leaveDisabled={phase === PHASES.ending}
+            />
+          </div>
         )}
 
-        {phase === PHASES.declined && (
-          <Card className="mx-auto max-w-xl">
-            <p className="text-primary/70">{t.consentDeclined}</p>
-            <Button className="mt-5" variant="outline" onClick={restart}>
-              {t.errorRetry}
-            </Button>
-          </Card>
-        )}
-
-        {phase === PHASES.loading && (
-          <Card className="mx-auto max-w-xl">
-            <Loader label={session ? t.submitting : t.loadingQuestions} />
-          </Card>
-        )}
-
-        {(phase === PHASES.answering || phase === PHASES.feedback) && question && (
-          <>
-            <QuestionCard index={index} total={questions.length} question={question} />
-
-            <Card className="space-y-5">
-              <VideoPreview stream={recorder.stream} blobUrl={recorder.blobUrl} />
-              <RecorderControls
-                isRecording={recorder.isRecording}
-                hasRecording={Boolean(recorder.blobUrl)}
-                seconds={recorder.seconds}
-                onStart={recorder.start}
-                onStop={recorder.stop}
-              />
-              <TranscriptInput
-                value={transcript}
-                onChange={setTranscript}
-                disabled={phase === PHASES.feedback}
-              />
-              {phase === PHASES.answering && (
-                <Button variant="accent" onClick={submit}>
-                  {t.submit}
-                </Button>
-              )}
-            </Card>
-          </>
-        )}
-
-        {phase === PHASES.feedback && (
-          <>
-            <LiveFeedback feedback={feedback} />
-            <Button variant="accent" onClick={goNext}>
-              {isLastQuestion ? t.finish : t.next}
-            </Button>
-          </>
-        )}
-
-        {phase === PHASES.complete && (
+        {phase === PHASES.ended && (
           <Card className="mx-auto max-w-xl text-center">
             <h2 className="text-xl font-semibold text-primary">{t.completeTitle}</h2>
             <p className="mt-2 text-primary/70">{t.completeBody}</p>
+
+            {notes.length > 0 && (
+              <div className="mt-6 rounded-lg bg-surface p-4 text-left">
+                <p className="text-sm font-medium text-primary">{t.presenceTitle}</p>
+                <p className="mt-1 text-xs text-primary/60">{t.presenceCaveat}</p>
+                <ul className="mt-3 space-y-2">
+                  {notes.map((note) => (
+                    <li key={note} className="flex gap-3 text-sm text-primary/80">
+                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent" />
+                      {note}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <Button as={Link} to="/passport" variant="accent">
                 {t.viewPassport}
               </Button>
-              <Button variant="outline" onClick={restart}>
+              <Button variant="outline" onClick={backToLobby}>
                 {t.startAnother}
               </Button>
             </div>
@@ -218,12 +372,12 @@ export default function InterviewSession() {
 
 function ErrorNotice({ error, cameraError }) {
   const t = strings.interview
-  const message = cameraError ? t.errorCamera : (error.response?.data?.detail ?? error.message)
+  const message = cameraError ? t.errorCamera : (error?.message ?? String(error))
 
   return (
     <Card className="border-accent/40 bg-accent/10">
       <h2 className="font-semibold text-primary">{t.errorTitle}</h2>
-      <p className="mt-1 text-sm text-primary/70">{message}</p>
+      <p className="mt-1 whitespace-pre-line text-sm text-primary/70">{message}</p>
     </Card>
   )
 }
