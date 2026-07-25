@@ -9,7 +9,7 @@ export default function DailyGoalCard({ label, completed, target, unit }) {
   const percent = Math.round(ratio * 100)
 
   return (
-    <Panel className="flex h-full items-center gap-4">
+    <Panel lift className="flex h-full items-center gap-4">
       <div className="relative shrink-0">
         <svg width="68" height="68" viewBox="0 0 68 68" aria-hidden="true" className="-rotate-90">
           <circle cx="34" cy="34" r={RADIUS} fill="none" stroke={brandColors.track} strokeWidth="6" />

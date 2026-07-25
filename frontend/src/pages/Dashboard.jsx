@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import AppShell from '../components/app/AppShell.jsx'
 import NavIcon from '../components/app/NavIcon.jsx'
 import Loader from '../components/common/Loader.jsx'
+import Reveal from '../components/common/Reveal.jsx'
 import DailyGoalCard from '../components/dashboard/DailyGoalCard.jsx'
 import GreetingCard from '../components/dashboard/GreetingCard.jsx'
 import LearningGrowthCard from '../components/dashboard/LearningGrowthCard.jsx'
@@ -63,48 +64,48 @@ export default function Dashboard() {
           </Panel>
         ) : (
           <div className="grid gap-5 lg:grid-cols-12">
-            <div className="lg:col-span-8">
+            <Reveal className="lg:col-span-8">
               <GreetingCard
                 greeting={greetingFor()}
                 name={user?.first_name}
                 sessionsRemaining={Math.max(0, WEEKLY_SESSION_GOAL - summary.sessionsThisWeek)}
                 focusArea={summary.hasHistory ? summary.weakest.label : 'interview practice'}
               />
-            </div>
-            <div className="lg:col-span-4">
+            </Reveal>
+            <Reveal delay={80} className="lg:col-span-4">
               <StreakCard days={summary.streakDays} weekProgress={summary.weekProgress} />
-            </div>
+            </Reveal>
 
-            <div className="sm:col-span-1 lg:col-span-3">
+            <Reveal delay={120} className="sm:col-span-1 lg:col-span-3">
               <SkillScoreCard
                 label="Overall Interview Score"
                 value={summary.overall.toFixed(1)}
                 outOf={SCORE_MAX}
                 changePercent={summary.changePercent}
               />
-            </div>
-            <div className="sm:col-span-1 lg:col-span-3">
+            </Reveal>
+            <Reveal delay={160} className="sm:col-span-1 lg:col-span-3">
               <DailyGoalCard
                 label="Daily Goal"
                 completed={summary.answersToday}
                 target={DAILY_ANSWER_GOAL}
                 unit="Answers scored"
               />
-            </div>
-            <div className="lg:col-span-6">
+            </Reveal>
+            <Reveal delay={200} className="lg:col-span-6">
               <SuggestionCard title={suggestion.title} description={suggestion.description} />
-            </div>
+            </Reveal>
 
-            <div className="lg:col-span-8">
+            <Reveal className="lg:col-span-8">
               <LearningGrowthCard data={summary.growth} />
-            </div>
-            <div className="lg:col-span-4">
+            </Reveal>
+            <Reveal delay={80} className="lg:col-span-4">
               <ScoreBreakdownCard averages={summary.averages} hasHistory={summary.hasHistory} />
-            </div>
+            </Reveal>
 
-            <div className="lg:col-span-12">
+            <Reveal className="lg:col-span-12">
               <RecentActivitiesCard activities={summary.activities} />
-            </div>
+            </Reveal>
           </div>
         )}
       </div>
@@ -112,9 +113,13 @@ export default function Dashboard() {
       <Link
         to="/interview"
         aria-label="Start a mock interview"
-        className="fixed bottom-6 right-6 flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/30 transition-transform hover:scale-105"
+        className="group fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/40 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
       >
-        <NavIcon name="mic" />
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 rounded-full bg-brand-blue/40 opacity-0 blur-md transition duration-300 group-hover:scale-125 group-hover:opacity-100"
+        />
+        <NavIcon name="mic" className="relative h-6 w-6" />
       </Link>
     </AppShell>
   )
