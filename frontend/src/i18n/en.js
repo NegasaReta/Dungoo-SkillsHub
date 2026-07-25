@@ -61,6 +61,7 @@ export const strings = {
       ],
       cardQuestion: 'Question 2 of 5',
       cardRecording: 'Recording',
+      cardImageAlt: 'A young Ethiopian woman answering an interview question on camera',
       cardPrompt: '“Tell me about a problem you solved that others on your team had missed.”',
       cardFeedback:
         'Strong result and a clear outcome. Next time, name the specific metric you improved so the impact lands faster.',
