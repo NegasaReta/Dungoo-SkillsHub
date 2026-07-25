@@ -1,8 +1,10 @@
 /**
- * Demo history for the deployed demo build (mock API only).
+ * Demo history for the progress pages.
  *
- * This exists so the progress pages can be shown filled in on stage without a
- * backend and without waiting through a live scoring run. Two rules keep it honest:
+ * This exists so the progress pages can be shown filled in on stage without
+ * waiting through a live scoring run. It is stored in the browser in both API
+ * modes and never posted to the backend, so running against the real API cannot
+ * leave sample rows in the database. Two rules keep it honest:
  *
  *  1. Scores are NOT written by hand. Every seeded answer is a real transcript run
  *     through the same heuristic scorer a live mock answer goes through, so the
@@ -10,8 +12,13 @@
  *  2. Every seeded row is tagged `demo: true` and can be cleared in one click,
  *     so it can never be mistaken for something the user actually practised.
  */
-import { buildResponse, hasDemoSessions, importSessions, removeDemoSessions } from '../api/mockInterview.js'
-import { currentUserId } from '../api/mockApi.js'
+import {
+  buildResponse,
+  hasDemoSessions,
+  importSessions,
+  readDemoSessions,
+  removeDemoSessions,
+} from '../api/mockInterview.js'
 import { PEERS } from '../data/matching.js'
 import {
   hasDemoExchangeSessions,
@@ -137,8 +144,9 @@ export function hasDemoData() {
   return hasDemoSessions() || hasDemoExchangeSessions()
 }
 
-export function seedDemoData() {
-  const userId = currentUserId()
+export { readDemoSessions }
+
+export function seedDemoData(userId) {
   if (!userId) throw new Error('Sign in before loading demo data.')
 
   clearDemoData()

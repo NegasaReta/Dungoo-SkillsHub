@@ -188,6 +188,16 @@ export function removeDemoSessions() {
   writeSessions(readSessions().filter((session) => !session.demo))
 }
 
+/**
+ * Seeded history on its own, oldest first. Against the real backend these rows are
+ * never returned by fetchSessions, so the progress pages overlay them from here.
+ */
+export function readDemoSessions(userId) {
+  return readSessions()
+    .filter((session) => session.demo && session.user_id === userId)
+    .sort((a, b) => a.created_at.localeCompare(b.created_at))
+}
+
 export function hasDemoSessions() {
   return readSessions().some((session) => session.demo)
 }

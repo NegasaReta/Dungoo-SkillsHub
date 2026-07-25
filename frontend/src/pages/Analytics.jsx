@@ -15,7 +15,6 @@ import Panel from '../components/dashboard/Panel.jsx'
 import GrowthMilestones from '../components/passport/GrowthMilestones.jsx'
 import ScoreRadarChart from '../components/passport/ScoreRadarChart.jsx'
 import { SCORE_MAX } from '../constants.js'
-import { usingMockApi } from '../api/index.js'
 import { useUser } from '../context/UserContext.jsx'
 import useProgress from '../hooks/useProgress.js'
 import { dailyPractice, practiceRangeStats } from '../lib/activity.js'
@@ -111,7 +110,7 @@ export default function Analytics() {
               </>
             )}
 
-            <SampleDataButton signedIn={Boolean(user)} />
+            <SampleDataButton userId={user?.id} />
           </div>
         </div>
 
@@ -212,17 +211,18 @@ export default function Analytics() {
 }
 
 /**
- * Demo-only affordance: fills the page with sample history so the progress view can
- * be shown without a backend. Seeded rows are tagged and removable — lib/demoData.js.
+ * Demo affordance: fills the page with sample history so the progress view can be
+ * shown without practising through it first. Seeded rows stay in the browser, are
+ * tagged, and clear in one click — lib/demoData.js.
  */
-function SampleDataButton({ signedIn }) {
+function SampleDataButton({ userId }) {
   const [loaded, setLoaded] = useState(hasDemoData)
 
-  if (!usingMockApi || !signedIn) return null
+  if (!userId) return null
 
   const toggle = () => {
     if (loaded) clearDemoData()
-    else seedDemoData()
+    else seedDemoData(userId)
 
     setLoaded(!loaded)
     // Simplest reliable refresh of every hook reading practice history.
