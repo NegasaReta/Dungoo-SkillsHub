@@ -15,8 +15,8 @@ export const QUICK_ACTIONS = [
   {
     to: '/interview',
     icon: 'mic',
-    label: 'Mock Interview',
-    keywords: 'mock interview record video question star practice',
+    label: 'AI Interview',
+    keywords: 'ai mock interview record video question star practice',
   },
   {
     to: '/passport',

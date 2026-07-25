@@ -346,9 +346,40 @@ export const strings = {
     errorTitle: 'Something went wrong',
     errorNoRecording: 'We did not catch any audio for that answer.',
     errorTranscription: 'We could not turn that answer into text. Carrying on with the interview.',
-    errorCamera:
-      'We could not reach your camera or microphone. Check your browser permissions and try again.',
     errorNotSignedIn: 'Sign in before starting an interview.',
+
+    // The microphone is the interview: without it there is nothing to answer with.
+    micTitle: 'We cannot reach your microphone',
+    micFaults: {
+      systemBlocked:
+        'Windows is blocking microphone access for your browser, so the site permission is not enough on its own. Open Settings → Privacy → Microphone, turn on "Allow apps to access your microphone" and the desktop apps switch below it, then reload this page.',
+      siteBlocked:
+        'This site is not allowed to use your microphone. Click the padlock in the address bar, set Microphone to Allow, then reload this page.',
+      notFound:
+        'No microphone is attached. Plug one in, or connect a headset, and reload this page.',
+      inUse:
+        'Another app is holding your microphone. Close any other call, recorder, or meeting window, then reload this page.',
+      insecure:
+        'Browsers only share a microphone over a secure connection. Open this site on localhost or https and try again.',
+      unknown: 'We could not reach your microphone. Check its connection and reload this page.',
+    },
+
+    // The camera is optional: it powers the self-view and the closing presence
+    // notes, and the interview runs perfectly well without either.
+    cameraOffTitle: 'Running without your camera',
+    cameraFaults: {
+      systemBlocked:
+        'Windows is blocking camera access for your browser. To turn it on, open Settings → Privacy → Camera and enable camera access for your apps.',
+      siteBlocked:
+        'This site is not allowed to use your camera. To turn it on, click the padlock in the address bar and set Camera to Allow.',
+      notFound: 'No camera was found on this device.',
+      inUse: 'Another app is using your camera.',
+      insecure: 'Your camera needs a secure connection, so it is unavailable here.',
+      unknown: 'Your camera could not be started.',
+    },
+    cameraOffBody:
+      'The interview itself is unaffected — you will be heard, transcribed, and scored exactly as normal. You will just have no self-view, and no notes on how you came across on camera.',
+    cameraUnavailableAction: 'Camera unavailable',
   },
 
   passport: {

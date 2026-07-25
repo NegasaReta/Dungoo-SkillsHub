@@ -6,6 +6,7 @@ import Button from '../components/common/Button.jsx'
 import Card from '../components/common/Card.jsx'
 import Loader from '../components/common/Loader.jsx'
 import CallControls from '../components/interview/CallControls.jsx'
+import CallIcon from '../components/interview/CallIcon.jsx'
 import CallStage from '../components/interview/CallStage.jsx'
 import CaptionRail from '../components/interview/CaptionRail.jsx'
 import RoomLobby from '../components/interview/RoomLobby.jsx'
@@ -23,6 +24,7 @@ import useInterviewMedia from '../hooks/useInterviewMedia.js'
 import useQuestionAudio from '../hooks/useQuestionAudio.js'
 import useVoiceActivity from '../hooks/useVoiceActivity.js'
 import { strings } from '../i18n/en.js'
+import { classifyMediaError } from '../lib/mediaErrors.js'
 
 const PHASES = {
   lobby: 'lobby',
@@ -55,6 +57,8 @@ export default function InterviewSession() {
     stream,
     micOn,
     cameraOn,
+    hasCamera,
+    cameraFault,
     error: mediaError,
     open: openMedia,
     startAnswer,
@@ -285,7 +289,9 @@ export default function InterviewSession() {
   return (
     <AppShell>
       <div className="mx-auto max-w-4xl space-y-6">
-        {error && <ErrorNotice error={error} cameraError={mediaError} />}
+        {error && <ErrorNotice error={error} mediaError={mediaError} />}
+
+        {cameraFault && phase !== PHASES.lobby && <CameraNotice fault={cameraFault} />}
 
         {phase === PHASES.lobby && (
           <RoomLobby
@@ -312,6 +318,7 @@ export default function InterviewSession() {
               candidateName={displayName(user, t.youName)}
               stream={stream}
               cameraOn={cameraOn}
+              hasCamera={hasCamera}
               micOn={micOn}
               candidateSpeaking={phase === PHASES.listening && isSpeaking}
               level={level}
@@ -324,6 +331,7 @@ export default function InterviewSession() {
             <CallControls
               micOn={micOn}
               cameraOn={cameraOn}
+              hasCamera={hasCamera}
               captionsOn={captionsOn}
               onToggleMic={toggleMic}
               onToggleCamera={toggleCamera}
@@ -370,14 +378,39 @@ export default function InterviewSession() {
   )
 }
 
-function ErrorNotice({ error, cameraError }) {
+/**
+ * A failure the candidate can act on.
+ *
+ * A microphone fault is named by where the fix actually lives, which is not
+ * always the browser: on Windows the OS privacy setting refuses first, and the
+ * browser reports that as the unhelpful "Permission denied by system".
+ */
+function ErrorNotice({ error, mediaError }) {
   const t = strings.interview
-  const message = cameraError ? t.errorCamera : (error?.message ?? String(error))
+  const fault = mediaError ? classifyMediaError(mediaError) : null
 
   return (
     <Card className="border-accent/40 bg-accent/10">
-      <h2 className="font-semibold text-primary">{t.errorTitle}</h2>
-      <p className="mt-1 whitespace-pre-line text-sm text-primary/70">{message}</p>
+      <h2 className="font-semibold text-primary">{fault ? t.micTitle : t.errorTitle}</h2>
+      <p className="mt-1 whitespace-pre-line text-sm text-primary/70">
+        {fault ? t.micFaults[fault] : (error?.message ?? String(error))}
+      </p>
+    </Card>
+  )
+}
+
+/** The camera failed but the interview did not: said plainly, and not as an error. */
+function CameraNotice({ fault }) {
+  const t = strings.interview
+
+  return (
+    <Card className="border-primary/10">
+      <h2 className="flex items-center gap-2 font-semibold text-primary">
+        <CallIcon name="cameraOff" className="h-5 w-5 shrink-0 text-primary/60" />
+        {t.cameraOffTitle}
+      </h2>
+      <p className="mt-1 text-sm text-primary/70">{t.cameraFaults[fault]}</p>
+      <p className="mt-2 text-sm text-primary/60">{t.cameraOffBody}</p>
     </Card>
   )
 }

@@ -10,6 +10,7 @@ export default function CallStage({
   candidateName,
   stream,
   cameraOn,
+  hasCamera = true,
   micOn,
   candidateSpeaking,
   level,
@@ -56,7 +57,7 @@ export default function CallStage({
         />
         <ParticipantTile
           name={candidateName}
-          label={t.yourCameraOff}
+          label={hasCamera ? t.yourCameraOff : t.cameraUnavailableAction}
           avatar={<InitialsAvatar name={candidateName} />}
           stream={stream}
           videoOn={cameraOn}
