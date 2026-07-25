@@ -83,8 +83,9 @@ python scripts/acceptance_check.py            # defaults to http://127.0.0.1:800
 | Variable | Purpose | Default |
 | --- | --- | --- |
 | `DATABASE_URL` | Neon Postgres connection string | `sqlite:///./dungoo.db` |
-| `LLM_API_KEY` | Key for the scoring provider; scoring is disabled when empty | empty |
-| `LLM_MODEL` | Model used for rubric scoring | `gpt-4o-mini` |
+| `LLM_API_KEY` | Google AI Studio key for scoring, question selection, and lead-ins; these fall back to unscored answers, a fixed question order, and the authored lead-ins when empty | empty |
+| `LLM_MODEL` | Gemini model behind scoring, question selection, and lead-ins. Lite by default: one interview costs about a dozen calls, and `gemini-2.5-flash` allows 20 a day on the free tier | `gemini-flash-lite-latest` |
+| `INTERVIEW_GENERATE_LEAD_INS` | Let the model write the sentence before each question. Off uses the authored lead-ins from the bank | `true` |
 | `SECRET_KEY` | JWT signing secret | `change-me` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT lifetime in minutes | `10080` (7 days) |
 | `CORS_ORIGINS` | Comma-separated origins, or `*` for local dev | `*` |
@@ -137,10 +138,9 @@ so `0912345678`, `912345678`, `251912345678`, and `+251912345678` all persist as
 | `GET` | `/interview/questions?role=` | Question bank for a role |
 | `POST` | `/interview/sessions` | Start a session |
 | `POST` | `/interview/sessions/{id}/responses` | Submit a transcript and get scored |
-| `POST` | `/interview/sessions/{id}/complete` | Mark a session finished |
+| `POST` | `/interview/sessions/{id}/complete` | Finish a session, score its answers, update the passport |
 | `GET` | `/interview/sessions/{id}/feedback` | All feedback for a session |
-| `POST` | `/passport/{user_id}/rebuild` | Re-aggregate completed sessions |
-| `GET` | `/passport/{user_id}` | Fetch the skill passport |
+| `GET` | `/passport/me` | The signed-in user's Skill Passport |
 
 ## Deployment
 
@@ -152,6 +152,46 @@ shipping a `.env`, and lock `CORS_ORIGINS` down to the real frontend origin.
 ## Where to add code
 
 - `app/core/security.py` — password hashing and JWT helpers.
-- `app/services/ai_scoring.py` — `_call_llm` is the single place the provider is called.
+- `app/services/llm.py` — the single place Gemini is called for text.
+- `app/services/ai_scoring.py` — the rubric prompt and how a reply becomes scores.
+- `app/services/session_scoring.py` — turns a finished session into feedback reports.
+- `app/services/passport_builder.py` — aggregates reports into the Skill Passport.
 - `app/services/transcription.py` — speech-to-text provider.
+- `app/services/lead_ins.py` — the sentence said before each question, and its guards.
 - `app/data/questions.json` — the question bank, keyed by role slug.
+
+## How a question gets asked
+
+The bank question is always asked word for word. What the model contributes is the
+sentence in front of it — "Most of this job is reading code you did not write." — so
+the interviewer sounds like a person raising a topic rather than a form being read
+out. `POST /interview/sessions` writes one lead-in per question of the role into
+`interview_sessions.lead_ins` in a single batched call, while the candidate is still
+on the joining screen; no turn ever waits on the model mid-conversation.
+`InterviewTurn.question_text` then stores lead-in plus question exactly as spoken,
+which is what gets synthesised, captioned, and scored.
+
+Two things keep this from corrupting the assessment:
+
+- Generated lines are checked by `lead_ins.is_usable` before they can be spoken. A
+  line that asks a question, runs long, restates the question, or uses rubric
+  vocabulary ("give me a concrete example with a measurable result") is dropped in
+  favour of the authored one. Coaching the shape of an answer would turn the STAR
+  score into a test of whether the candidate followed instructions.
+- Every question in the bank carries an authored `lead_in`. It is the fallback for a
+  rejected line, a missing id, a refusal, a timeout, or no API key, so the
+  interviewer always has something to say. The opening greeting is never generated.
+
+Set `INTERVIEW_GENERATE_LEAD_INS=false` to run entirely on the authored text.
+
+## Skill Passport
+
+`GET /passport/me` derives the credential from stored feedback reports on every
+request, so it cannot drift from the sessions behind it. Scoring happens once, when
+`POST /interview/sessions/{id}/complete` runs: each answered turn is scored in
+parallel, unscorable answers are skipped rather than stored as zeros, and the
+aggregate is written to `skill_passports`.
+
+`level` and `milestones[].id` are keys, not display text — the frontend maps them to
+copy in `src/i18n/en.js` so they can be translated. Scores use the 1-5 rubric, where
+`0` means "not scored yet" rather than a failing mark.
