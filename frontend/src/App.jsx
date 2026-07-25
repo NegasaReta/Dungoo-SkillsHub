@@ -14,12 +14,14 @@ import Signup from './pages/Signup.jsx'
 
 // The signed-in app pulls in charting and the dashboard shell, so it is split
 // out of the bundle that visitors download for the landing and auth pages.
+const Analytics = lazy(() => import('./pages/Analytics.jsx'))
 const ComingSoon = lazy(() => import('./pages/ComingSoon.jsx'))
 const CompleteProfile = lazy(() => import('./pages/CompleteProfile.jsx'))
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
 const InterviewSession = lazy(() => import('./pages/InterviewSession.jsx'))
 const Matching = lazy(() => import('./pages/Matching.jsx'))
 const Onboarding = lazy(() => import('./pages/Onboarding.jsx'))
+const Resources = lazy(() => import('./pages/Resources.jsx'))
 const Settings = lazy(() => import('./pages/Settings.jsx'))
 const SkillPassport = lazy(() => import('./pages/SkillPassport.jsx'))
 
@@ -64,11 +66,7 @@ function GuestOnly({ children }) {
   return children
 }
 
-const PLACEHOLDER_ROUTES = [
-  { path: '/coach', title: 'AI Coach' },
-  { path: '/analytics', title: 'Analytics' },
-  { path: '/resources', title: 'Resources' },
-]
+const PLACEHOLDER_ROUTES = [{ path: '/coach', title: 'AI Coach' }]
 
 function AppRoutes() {
   return (
@@ -134,6 +132,24 @@ function AppRoutes() {
         element={
           <Protected>
             <Matching />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/analytics"
+        element={
+          <Protected>
+            <Analytics />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/resources"
+        element={
+          <Protected>
+            <Resources />
           </Protected>
         }
       />

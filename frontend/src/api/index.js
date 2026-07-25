@@ -23,6 +23,9 @@ export const {
   resetPassword,
 } = api
 
+// Interview screens that import these from here work with or without a backend.
+// Importing './interview.js' directly bypasses the mock, which also means the
+// session never reaches the Skill Passport or dashboard while running on mocks.
 export const { fetchQuestions, createSession, submitResponse, completeSession, fetchSessions } =
   interview
 

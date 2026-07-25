@@ -3,6 +3,37 @@
  * added later without touching markup. Import `strings`, never inline copy.
  */
 export const strings = {
+  resources: {
+    eyebrow: 'Library',
+    title: 'Resource Library',
+    subtitle:
+      'Guides and drills for interviews, professional English, and workplace communication. Everything here is readable in the app.',
+    searchLabel: 'Search resources',
+    searchPlaceholder: 'Search guides and drills…',
+    topicsLabel: 'Topic',
+    featured: 'Featured guide',
+    startReading: 'Start reading',
+    read: 'Read',
+    close: 'Close',
+    print: 'Print or save as PDF',
+    minutesRead: '{minutes} min read',
+    minutesPractice: '{minutes} min practice',
+    watch: 'Watch',
+    watchNote: 'Plays here from YouTube. Nothing loads until you open it.',
+    openOnYoutube: 'Open on YouTube',
+    videoBy: 'By {channel}',
+    empty: 'Nothing matches that search yet.',
+    emptyHint: 'Try a different word, or clear the topic filter.',
+    clearFilters: 'Clear filters',
+    planTitle: 'Where to start',
+    planScored: 'Your weakest axis is {axis}, so these come first.',
+    planUnscored:
+      'Once you have a scored interview answer, this list reorders itself around your weakest axis.',
+    planFallback: 'A reasonable order for anyone preparing from scratch.',
+    resultCount: '{count} resource',
+    resultCountPlural: '{count} resources',
+  },
+
   landing: {
     nav: {
       links: [

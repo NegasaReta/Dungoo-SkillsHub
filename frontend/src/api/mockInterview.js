@@ -159,6 +159,39 @@ function buildFeedback(stats, scores) {
   return { summary, strengths: strengths.slice(0, 3), improvements: improvements.slice(0, 3) }
 }
 
+/**
+ * Scores one transcript. Exported so demo history is produced by the same code
+ * path as a live answer — seeded scores are computed, never hand-written.
+ */
+export function buildResponse({ questionId, transcript, createdAt }) {
+  const stats = analyze(transcript)
+  const scores = scoreTranscript(stats)
+
+  return {
+    question_id: questionId,
+    transcript,
+    ...scores,
+    ...buildFeedback(stats, scores),
+    created_at: createdAt ?? new Date().toISOString(),
+  }
+}
+
+// --- Demo history ------------------------------------------------------------
+// Sessions carry `demo: true` so seeded history can be cleared without touching
+// anything the user actually practised.
+
+export function importSessions(sessions) {
+  writeSessions([...readSessions(), ...sessions])
+}
+
+export function removeDemoSessions() {
+  writeSessions(readSessions().filter((session) => !session.demo))
+}
+
+export function hasDemoSessions() {
+  return readSessions().some((session) => session.demo)
+}
+
 // --- Endpoints ---------------------------------------------------------------
 
 export async function fetchQuestions(role) {
@@ -196,15 +229,7 @@ export async function submitResponse(sessionId, { questionId, transcript }) {
   )
   if (index === -1) throw new Error('Session not found.')
 
-  const stats = analyze(transcript)
-  const scores = scoreTranscript(stats)
-  const report = {
-    question_id: questionId,
-    transcript,
-    ...scores,
-    ...buildFeedback(stats, scores),
-    created_at: new Date().toISOString(),
-  }
+  const report = buildResponse({ questionId, transcript })
 
   sessions[index] = { ...sessions[index], responses: [...sessions[index].responses, report] }
   writeSessions(sessions)
