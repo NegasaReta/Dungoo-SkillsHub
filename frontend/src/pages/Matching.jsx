@@ -46,7 +46,7 @@ export default function Matching() {
       <div className="space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-blue">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-link">
               Peer language exchange
             </p>
             <h1 className="mt-1 text-3xl font-bold text-primary">Find a practice partner</h1>
@@ -89,7 +89,7 @@ export default function Matching() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-1 rounded-lg border border-primary/15 bg-white p-1">
+              <div className="flex items-center gap-1 rounded-lg border border-primary/15 bg-panel p-1">
                 <button
                   type="button"
                   aria-label="Grid view"

@@ -2,8 +2,8 @@ import NavIcon from '../app/NavIcon.jsx'
 
 export default function InviteCard() {
   return (
-    <section className="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-primary/20 bg-white p-5 text-center shadow-sm">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface text-brand-blue">
+    <section className="lift flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-primary/20 bg-panel p-5 text-center shadow-sm">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-surface text-link">
         <NavIcon name="plus" className="h-6 w-6" />
       </span>
       <h3 className="mt-4 text-base font-semibold text-primary">Missing someone?</h3>

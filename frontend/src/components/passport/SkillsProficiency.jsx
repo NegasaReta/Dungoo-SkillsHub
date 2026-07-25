@@ -7,7 +7,7 @@ export default function SkillsProficiency({ scores, hasHistory = true }) {
   const top = hasHistory ? topSkill(scores) : '—'
 
   return (
-    <Panel className="h-full">
+    <Panel spotlight className="h-full">
       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary/45">
         Skills proficiency
       </p>
@@ -25,7 +25,7 @@ export default function SkillsProficiency({ scores, hasHistory = true }) {
         </div>
         <div>
           <p className="text-[11px] uppercase tracking-wide text-primary/45">Top skill</p>
-          <p className="mt-1 text-lg font-semibold text-brand-blue">{top}</p>
+          <p className="mt-1 text-lg font-semibold text-link">{top}</p>
         </div>
       </div>
     </Panel>

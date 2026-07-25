@@ -3,7 +3,7 @@ import Panel from '../dashboard/Panel.jsx'
 
 const STATUS_STYLES = {
   gold: 'bg-accent/15 text-primary ring-accent/40',
-  elite: 'bg-brand-blue/10 text-brand-blue ring-brand-blue/25',
+  elite: 'bg-brand-blue/10 text-link ring-brand-blue/25',
   progress: 'bg-surface text-primary/70 ring-primary/15',
 }
 
@@ -14,7 +14,7 @@ export default function CredentialsGrid({ credentials }) {
         <h2 className="text-base font-semibold text-primary">Verified Credentials</h2>
         <button
           type="button"
-          className="text-xs font-medium text-brand-blue transition-colors hover:text-primary"
+          className="text-xs font-medium text-link transition-colors hover:text-primary"
         >
           View all
         </button>
@@ -24,9 +24,9 @@ export default function CredentialsGrid({ credentials }) {
         {credentials.map((credential) => (
           <article
             key={credential.id}
-            className="rounded-xl border border-primary/10 bg-surface p-4"
+            className="lift sheen rounded-xl border border-primary/10 bg-surface p-4"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-brand-blue shadow-sm">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-panel text-link shadow-sm">
               <NavIcon name={credential.icon} className="h-4 w-4" />
             </span>
             <h3 className="mt-3 text-sm font-semibold text-primary">{credential.title}</h3>
@@ -43,9 +43,9 @@ export default function CredentialsGrid({ credentials }) {
 
         <button
           type="button"
-          className="flex min-h-[148px] flex-col items-center justify-center rounded-xl border border-dashed border-primary/20 bg-white p-4 text-center transition-colors hover:border-brand-blue/40 hover:bg-surface"
+          className="lift flex min-h-[148px] flex-col items-center justify-center rounded-xl border border-dashed border-primary/20 bg-panel p-4 text-center hover:border-brand-blue/40 hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface text-brand-blue">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface text-link">
             <NavIcon name="plus" className="h-5 w-5" />
           </span>
           <span className="mt-3 text-sm font-medium text-primary">Add credential</span>

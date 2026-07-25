@@ -8,7 +8,7 @@ export default function SessionPanel({ session }) {
   const ratio = remaining / DAILY_LIMIT_SECONDS
 
   return (
-    <Panel className="border border-brand-blue/20 bg-brand-blue/5">
+    <Panel spotlight className="relative overflow-hidden border border-brand-blue/20 bg-brand-blue/5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-blue text-sm font-semibold text-white">
@@ -33,7 +33,7 @@ export default function SessionPanel({ session }) {
         </div>
       </div>
 
-      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white">
+      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-track">
         <div
           className="h-full rounded-full bg-accent transition-[width] duration-1000 ease-linear"
           style={{ width: `${ratio * 100}%` }}
@@ -51,7 +51,7 @@ export default function SessionPanel({ session }) {
             <button
               type="button"
               onClick={running ? pause : resume}
-              className="rounded-lg border border-primary/15 bg-white px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface"
+              className="rounded-lg border border-primary/15 bg-panel px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-surface"
             >
               {running ? 'Pause' : 'Resume'}
             </button>
@@ -59,7 +59,7 @@ export default function SessionPanel({ session }) {
           <button
             type="button"
             onClick={end}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-navy/90"
           >
             <NavIcon name="close" className="h-4 w-4" />
             End session

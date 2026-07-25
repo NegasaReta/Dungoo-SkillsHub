@@ -12,7 +12,7 @@ export default function GrowthMilestones({ milestones }) {
     <Panel className="h-full">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-base font-semibold text-primary">Growth Milestones</h2>
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-blue/10 text-brand-blue">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-blue/10 text-link">
           <NavIcon name="spark" className="h-4 w-4" />
         </span>
       </div>
@@ -21,7 +21,7 @@ export default function GrowthMilestones({ milestones }) {
         {milestones.map((milestone) => (
           <li key={milestone.id} className="relative">
             <span
-              className={`absolute -left-[1.6rem] top-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-white ${
+              className={`absolute -left-[1.6rem] top-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-panel ${
                 KIND_DOT[milestone.kind]
               }`}
             />
