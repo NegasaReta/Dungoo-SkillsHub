@@ -14,9 +14,12 @@ def signup(payload: SignupRequest, db: Session = Depends(get_db)) -> TokenRespon
     if db.query(User).filter(User.email == payload.email).first():
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Email already registered")
 
+    # The signup form collects a name; the SRS flow does not. Keep it when sent so
+    # the profile step does not have to ask again.
     user = User(
         email=payload.email.lower(),
         hashed_password=hash_password(payload.password),
+        full_name=payload.resolved_full_name,
         industries=[],
         languages=[],
         profile_completed=False,

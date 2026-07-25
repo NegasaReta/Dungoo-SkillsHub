@@ -99,6 +99,21 @@ python scripts/acceptance_check.py            # defaults to http://127.0.0.1:800
 | `POST` | `/profile/complete` | Save onboarding profile fields |
 | `GET` | `/meta/options` | Allowed education / industry / language values |
 
+### Name and phone handling
+
+The frontend edits names as `first_name` + `last_name`; the SRS and curl use a single
+`full_name`. Signup and `/profile/complete` accept either, store one collapsed name,
+and `/auth/me` returns all three so both styles work without a translation layer. The
+split happens on the first space, so `Abebe Kebede Bekele` comes back as first `Abebe`,
+last `Kebede Bekele`.
+
+A name is required overall but not at every step: the onboarding form omits it because
+signup already captured it, and only an account with no name at all gets a 422.
+
+Phone numbers are stored in E.164. Local Ethiopian forms are normalized on the way in,
+so `0912345678`, `912345678`, `251912345678`, and `+251912345678` all persist as
+`+251912345678`.
+
 ## Other endpoints
 
 | Method | Path | Purpose |

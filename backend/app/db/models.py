@@ -32,6 +32,22 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan", uselist=False
     )
 
+    # The frontend edits names as two fields while one column is stored, so the
+    # split happens on read. Splitting once keeps "Abebe Kebede Bekele" intact as
+    # first "Abebe", last "Kebede Bekele".
+    @property
+    def first_name(self) -> str | None:
+        if not self.full_name:
+            return None
+        return self.full_name.split(" ", 1)[0]
+
+    @property
+    def last_name(self) -> str | None:
+        if not self.full_name:
+            return None
+        parts = self.full_name.split(" ", 1)
+        return parts[1] if len(parts) > 1 else None
+
 
 class InterviewSession(Base):
     __tablename__ = "interview_sessions"
