@@ -3,6 +3,7 @@
 import json
 
 from app.core.config import settings
+from app.services import llm
 
 RUBRIC_PROMPT = """You are an interview coach scoring one answer from a candidate
 applying for the role of {role}.
@@ -67,4 +68,4 @@ def score_answer(role: str, question: str, transcript: str) -> dict:
 
 def _call_llm(prompt: str) -> str:
     """Send the prompt to the configured provider and return the raw reply."""
-    raise NotImplementedError("Wire up the LLM provider client here.")
+    return llm.generate_json(prompt)
