@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./dungoo.db"
     LLM_API_KEY: str = ""
     LLM_MODEL: str = "gpt-4o-mini"
+    # Separate provider from LLM_* above: the communication coach talks to Gemini directly.
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-3.1-flash-lite"
     SECRET_KEY: str = "change-me"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days

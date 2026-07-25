@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.db.database import Base, engine
-from app.routers import auth, interview, meta, passport, profile
+from app.routers import auth, interview, meta, passport, practice, profile
 
 Base.metadata.create_all(bind=engine)
 
@@ -24,6 +24,7 @@ app.include_router(profile.router)
 app.include_router(meta.router)
 app.include_router(interview.router)
 app.include_router(passport.router)
+app.include_router(practice.router)
 
 
 @app.get("/health", tags=["health"])

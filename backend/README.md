@@ -85,6 +85,8 @@ python scripts/acceptance_check.py            # defaults to http://127.0.0.1:800
 | `DATABASE_URL` | Neon Postgres connection string | `sqlite:///./dungoo.db` |
 | `LLM_API_KEY` | Key for the scoring provider; scoring is disabled when empty | empty |
 | `LLM_MODEL` | Model used for rubric scoring | `gpt-4o-mini` |
+| `GEMINI_API_KEY` | Key for the text-mode communication coach; `/practice/text` returns `503` when empty | empty |
+| `GEMINI_MODEL` | Model used by the communication coach | `gemini-3.1-flash-lite` |
 | `SECRET_KEY` | JWT signing secret | `change-me` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT lifetime in minutes | `10080` (7 days) |
 | `CORS_ORIGINS` | Comma-separated origins, or `*` for local dev | `*` |
@@ -110,6 +112,15 @@ python scripts/acceptance_check.py            # defaults to http://127.0.0.1:800
 | `GET` | `/interview/sessions/{id}/feedback` | All feedback for a session |
 | `POST` | `/passport/{user_id}/rebuild` | Re-aggregate completed sessions |
 | `GET` | `/passport/{user_id}` | Fetch the skill passport |
+| `POST` | `/practice/text` | Coach one typed message: corrected text, errors, follow-up |
+
+## Communication practice
+
+Text mode posts to `/practice/text`, which asks Gemini for a strict JSON verdict on one
+message and retries once if the reply will not parse. Voice mode never touches this
+service: the frontend connects straight to a public ElevenLabs agent that holds its own
+prompt, voice, and speech handling, so no ElevenLabs key belongs in this backend and there
+is no token endpoint to call.
 
 ## Deployment
 
@@ -122,5 +133,6 @@ shipping a `.env`, and lock `CORS_ORIGINS` down to the real frontend origin.
 
 - `app/core/security.py` — password hashing and JWT helpers.
 - `app/services/ai_scoring.py` — `_call_llm` is the single place the provider is called.
+- `app/services/practice_coach.py` — the coaching prompt and the Gemini call behind text mode.
 - `app/services/transcription.py` — speech-to-text provider.
 - `app/data/questions.json` — the question bank, keyed by role slug.
