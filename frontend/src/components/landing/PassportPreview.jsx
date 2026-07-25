@@ -1,8 +1,12 @@
+import { SCORE_MAX } from '../../constants.js'
+
 const SKILLS = [
-  { label: 'Clarity', value: 8.4 },
-  { label: 'Confidence', value: 7.1 },
-  { label: 'STAR structure', value: 9.0 },
+  { label: 'Clarity', value: 4.2 },
+  { label: 'Confidence', value: 3.6 },
+  { label: 'STAR structure', value: 4.5 },
 ]
+
+const AVERAGE_SCORE = SKILLS.reduce((total, skill) => total + skill.value, 0) / SKILLS.length
 
 const BENEFITS = [
   'Built automatically from real practice sessions, not self-reported claims.',
@@ -42,7 +46,7 @@ export default function PassportPreview() {
               <p className="text-xl font-semibold text-primary">Junior Software Engineer</p>
             </div>
             <span className="rounded-full bg-accent px-3 py-1 text-sm font-semibold text-primary">
-              8.2 avg
+              {AVERAGE_SCORE.toFixed(1)} / {SCORE_MAX} avg
             </span>
           </div>
 
@@ -51,12 +55,15 @@ export default function PassportPreview() {
               <div key={skill.label}>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-primary/70">{skill.label}</span>
-                  <span className="font-semibold text-primary">{skill.value.toFixed(1)}</span>
+                  <span className="font-semibold text-primary">
+                    {skill.value.toFixed(1)}
+                    <span className="font-normal text-primary/50"> / {SCORE_MAX}</span>
+                  </span>
                 </div>
                 <div className="mt-1.5 h-2 rounded-full bg-surface">
                   <div
                     className="h-2 rounded-full bg-brand-blue"
-                    style={{ width: `${skill.value * 10}%` }}
+                    style={{ width: `${(skill.value / SCORE_MAX) * 100}%` }}
                   />
                 </div>
               </div>

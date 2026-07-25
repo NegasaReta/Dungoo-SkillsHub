@@ -12,7 +12,7 @@ export default function DailyGoalCard({ completedMinutes, targetMinutes }) {
     <Panel className="flex h-full items-center gap-4">
       <div className="relative shrink-0">
         <svg width="68" height="68" viewBox="0 0 68 68" aria-hidden="true" className="-rotate-90">
-          <circle cx="34" cy="34" r={RADIUS} fill="none" stroke="#E2E8F2" strokeWidth="6" />
+          <circle cx="34" cy="34" r={RADIUS} fill="none" stroke={brandColors.track} strokeWidth="6" />
           <circle
             cx="34"
             cy="34"

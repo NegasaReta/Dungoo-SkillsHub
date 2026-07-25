@@ -20,7 +20,7 @@ const SkillPassport = lazy(() => import('./pages/SkillPassport.jsx'))
 
 function ScreenLoader() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-app-base">
+    <main className="flex min-h-screen items-center justify-center bg-surface">
       <Loader />
     </main>
   )

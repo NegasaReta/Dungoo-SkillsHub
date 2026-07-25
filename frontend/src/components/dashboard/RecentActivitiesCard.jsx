@@ -1,7 +1,7 @@
 import Panel from './Panel.jsx'
 
 const STATUS_STYLES = {
-  completed: 'bg-app-teal/10 text-app-teal ring-app-teal/25',
+  completed: 'bg-success/10 text-success ring-success/25',
   in_progress: 'bg-accent/15 text-primary ring-accent/40',
 }
 
@@ -42,7 +42,7 @@ export default function RecentActivitiesCard({ activities }) {
                   {activity.score === null ? (
                     <span className="text-primary/40">N/A</span>
                   ) : (
-                    <span className="font-semibold text-app-teal">{activity.score}/100</span>
+                    <span className="font-semibold text-success">{activity.score}/100</span>
                   )}
                 </td>
                 <td className="py-4 pr-4 text-sm text-primary/60">{activity.date}</td>

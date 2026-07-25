@@ -27,7 +27,7 @@ export default function Settings() {
             <span
               className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ring-1 ${
                 profileCompleted
-                  ? 'bg-app-teal/10 text-app-teal ring-app-teal/25'
+                  ? 'bg-success/10 text-success ring-success/25'
                   : 'bg-accent/15 text-primary ring-accent/40'
               }`}
             >

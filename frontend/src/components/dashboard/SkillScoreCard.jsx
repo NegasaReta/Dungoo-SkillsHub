@@ -8,7 +8,7 @@ export default function SkillScoreCard({ value, changePercent }) {
       <p className="text-xs text-primary/60">Global Skill Score</p>
       <div className="mt-2 flex items-baseline gap-2">
         <span className="text-3xl font-bold text-primary">{value}</span>
-        <span className={`text-xs font-medium ${positive ? 'text-app-teal' : 'text-red-600'}`}>
+        <span className={`text-xs font-medium ${positive ? 'text-success' : 'text-red-600'}`}>
           {positive ? '▲' : '▼'} {Math.abs(changePercent)}%
         </span>
       </div>

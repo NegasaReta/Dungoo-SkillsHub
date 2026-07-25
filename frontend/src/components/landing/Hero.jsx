@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom'
 
 import Button from '../common/Button.jsx'
 
+import { SCORE_MAX } from '../../constants.js'
+
 const SAMPLE_SCORES = [
-  { label: 'Clarity', value: 8.4 },
-  { label: 'Confidence', value: 7.1 },
-  { label: 'STAR structure', value: 9.0 },
+  { label: 'Clarity', value: 4.2 },
+  { label: 'Confidence', value: 3.6 },
+  { label: 'STAR structure', value: 4.5 },
 ]
 
 export default function Hero() {
@@ -61,12 +63,15 @@ export default function Hero() {
               <div key={score.label}>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-primary/70">{score.label}</span>
-                  <span className="font-semibold text-primary">{score.value.toFixed(1)}</span>
+                  <span className="font-semibold text-primary">
+                    {score.value.toFixed(1)}
+                    <span className="font-normal text-primary/50"> / {SCORE_MAX}</span>
+                  </span>
                 </div>
                 <div className="mt-1.5 h-2 rounded-full bg-surface">
                   <div
                     className="h-2 rounded-full bg-accent"
-                    style={{ width: `${score.value * 10}%` }}
+                    style={{ width: `${(score.value / SCORE_MAX) * 100}%` }}
                   />
                 </div>
               </div>
