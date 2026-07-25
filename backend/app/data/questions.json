@@ -1,0 +1,53 @@
+{
+  "software-engineer": [
+    {
+      "id": "swe-1",
+      "text": "Tell me about a bug you found that others had missed. How did you track it down?",
+      "competency": "problem-solving"
+    },
+    {
+      "id": "swe-2",
+      "text": "Describe a time you disagreed with a technical decision on your team.",
+      "competency": "collaboration"
+    },
+    {
+      "id": "swe-3",
+      "text": "Walk me through a project you shipped end to end and what you would change.",
+      "competency": "ownership"
+    }
+  ],
+  "data-analyst": [
+    {
+      "id": "da-1",
+      "text": "Describe an analysis where the data contradicted what stakeholders expected.",
+      "competency": "communication"
+    },
+    {
+      "id": "da-2",
+      "text": "Tell me about a time you had to work with messy or incomplete data.",
+      "competency": "rigour"
+    },
+    {
+      "id": "da-3",
+      "text": "How have you turned an analysis into a decision someone actually made?",
+      "competency": "impact"
+    }
+  ],
+  "customer-support": [
+    {
+      "id": "cs-1",
+      "text": "Tell me about the most difficult customer you have handled.",
+      "competency": "empathy"
+    },
+    {
+      "id": "cs-2",
+      "text": "Describe a time you had to say no to a customer request.",
+      "competency": "communication"
+    },
+    {
+      "id": "cs-3",
+      "text": "How do you keep quality up when your queue is overloaded?",
+      "competency": "prioritisation"
+    }
+  ]
+}
