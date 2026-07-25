@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import AppShell from '../components/app/AppShell.jsx'
 import Button from '../components/common/Button.jsx'
 import Card from '../components/common/Card.jsx'
 import Loader from '../components/common/Loader.jsx'
@@ -13,9 +12,8 @@ import TranscriptInput from '../components/interview/TranscriptInput.jsx'
 import VideoPreview from '../components/interview/VideoPreview.jsx'
 import RoleSelect from '../components/onboarding/RoleSelect.jsx'
 import useMediaRecorder from '../hooks/useMediaRecorder.js'
-import { completeSession, createSession, fetchQuestions, submitResponse } from '../api/index.js'
-import { useUser } from '../context/UserContext.jsx'
-import { ROLES } from '../constants.js'
+import { completeSession, createSession, fetchQuestions, submitResponse } from '../api/interview.js'
+import { ROLES, STUB_USER_ID } from '../constants.js'
 import { strings } from '../i18n/en.js'
 
 const PHASES = {
@@ -30,7 +28,6 @@ const PHASES = {
 
 export default function InterviewSession() {
   const t = strings.interview
-  const { user } = useUser()
 
   const [phase, setPhase] = useState(PHASES.setup)
   const [role, setRole] = useState(ROLES[0].slug)
@@ -51,7 +48,7 @@ export default function InterviewSession() {
     try {
       const [bank, created] = await Promise.all([
         fetchQuestions(role),
-        createSession({ userId: user?.id, role }),
+        createSession({ userId: STUB_USER_ID, role }),
       ])
       setQuestions(bank)
       setSession(created)
@@ -61,7 +58,7 @@ export default function InterviewSession() {
       setError(cause)
       setPhase(PHASES.setup)
     }
-  }, [role, user?.id])
+  }, [role])
 
   const submit = useCallback(async () => {
     if (!transcript.trim()) {
@@ -117,16 +114,8 @@ export default function InterviewSession() {
   }, [recorder])
 
   return (
-    <AppShell>
-      <div className="mx-auto max-w-3xl space-y-5">
-        <header>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-blue">
-            {t.pageEyebrow}
-          </p>
-          <h1 className="mt-1 text-3xl font-bold text-primary">{t.pageTitle}</h1>
-          <p className="mt-2 text-sm text-primary/60">{t.pageSubtitle}</p>
-        </header>
-
+    <main className="min-h-screen bg-surface px-4 py-10">
+      <div className="mx-auto max-w-3xl space-y-6">
         {error && <ErrorNotice error={error} cameraError={recorder.error} />}
 
         {phase === PHASES.setup && (
@@ -212,7 +201,7 @@ export default function InterviewSession() {
           </Card>
         )}
       </div>
-    </AppShell>
+    </main>
   )
 }
 
