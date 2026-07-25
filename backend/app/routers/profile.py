@@ -31,6 +31,7 @@ def complete_profile(
     current_user.industries = payload.industries
     current_user.phone_number = payload.phone_number
     current_user.languages = payload.languages
+    current_user.practising_languages = payload.practising_languages
     current_user.profile_completed = True
 
     db.add(current_user)

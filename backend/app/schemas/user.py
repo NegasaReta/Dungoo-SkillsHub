@@ -37,6 +37,16 @@ def normalize_phone_number(value: str) -> str:
     return compact
 
 
+def validate_language_slugs(values: list[str], field: str) -> list[str]:
+    """Shared by the languages a member speaks and the ones they want to practise."""
+    unknown = sorted({v for v in values if v not in LANGUAGES})
+    if unknown:
+        raise ValueError(
+            f"Invalid {field}: {', '.join(unknown)}. Allowed: {', '.join(LANGUAGES)}"
+        )
+    return values
+
+
 def compose_full_name(
     full_name: str | None = None,
     first_name: str | None = None,
@@ -124,6 +134,23 @@ class ResetPasswordRequest(BaseModel):
     new_password: str = Field(min_length=8)
 
 
+class ChangePasswordRequest(BaseModel):
+    """Signed-in password change, which is why it proves the old password.
+
+    The reset flow exists for people who cannot log in; this one is for people who
+    can, so knowing the current password is what authorises the change.
+    """
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {"current_password": "supersecret123", "new_password": "N3w!password"}
+        }
+    )
+
+    current_password: str = Field(min_length=1)
+    new_password: str = Field(min_length=8)
+
+
 class MessageResponse(BaseModel):
     message: str
 
@@ -137,6 +164,7 @@ class ProfileCompleteRequest(NamedRequest):
                 "industries": ["tech", "education"],
                 "phone_number": "+251912345678",
                 "languages": ["amharic", "english"],
+                "practising_languages": ["afaan_oromo"],
             }
         }
     )
@@ -145,6 +173,9 @@ class ProfileCompleteRequest(NamedRequest):
     industries: list[str] = Field(min_length=1)
     phone_number: str
     languages: list[str] = Field(min_length=1)
+    # Optional: a member who only wants interview practice never has to fill it in,
+    # and clients written before peer matching existed do not send it.
+    practising_languages: list[str] = Field(default_factory=list)
 
     @field_validator("education_level")
     @classmethod
@@ -177,12 +208,12 @@ class ProfileCompleteRequest(NamedRequest):
     def validate_languages(cls, values: list[str]) -> list[str]:
         if not values:
             raise ValueError("At least one language is required")
-        unknown = sorted({v for v in values if v not in LANGUAGES})
-        if unknown:
-            raise ValueError(
-                f"Invalid languages: {', '.join(unknown)}. Allowed: {', '.join(LANGUAGES)}"
-            )
-        return values
+        return validate_language_slugs(values, "languages")
+
+    @field_validator("practising_languages")
+    @classmethod
+    def validate_practising_languages(cls, values: list[str]) -> list[str]:
+        return validate_language_slugs(values, "practising_languages")
 
 
 class UserMe(BaseModel):
@@ -199,6 +230,7 @@ class UserMe(BaseModel):
     industries: list[str]
     phone_number: str | None
     languages: list[str]
+    practising_languages: list[str]
     profile_completed: bool
     created_at: datetime
 
