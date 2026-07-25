@@ -1,13 +1,7 @@
 /** Rubric ceiling. The backend scores clarity, confidence, and STAR from 1 to 5. */
 export const SCORE_MAX = 5
 
-/**
- * Placeholder until the onboarding flow lands and supplies the signed-in user.
- * The backend rejects a session for a user id that does not exist.
- */
-export const STUB_USER_ID = 1
-
-/** Role slugs served by backend/app/data/questions.json. */
+/** Fallback roles if GET /interview/roles is unavailable. */
 export const ROLES = [
   { slug: 'software-engineer', label: 'Software Engineer' },
   { slug: 'data-analyst', label: 'Data Analyst' },

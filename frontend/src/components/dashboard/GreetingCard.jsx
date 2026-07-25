@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import NavIcon from '../app/NavIcon.jsx'
 import Panel from './Panel.jsx'
 
@@ -21,19 +23,19 @@ export default function GreetingCard({ greeting, name, sessionsRemaining, focusA
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
+          <Link
+            to="/interview"
             className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-blue/90"
           >
-            <NavIcon name="play" className="h-4 w-4" />
-            Continue Learning
-          </button>
-          <button
-            type="button"
+            <NavIcon name="mic" className="h-4 w-4" />
+            Start AI Interview
+          </Link>
+          <Link
+            to="/passport"
             className="rounded-lg border border-primary/15 bg-white px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-surface"
           >
-            View Plan
-          </button>
+            View Skill Passport
+          </Link>
         </div>
       </div>
     </Panel>

@@ -4,6 +4,8 @@ import NavIcon from './NavIcon.jsx'
 
 const NAV_ITEMS = [
   { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
+  { to: '/interview', icon: 'mic', label: 'AI Interview' },
+  { to: '/passport', icon: 'spark', label: 'Skill Passport' },
   { to: '/coach', icon: 'coach', label: 'AI Coach' },
   { to: '/matching', icon: 'matching', label: 'Matching' },
   { to: '/analytics', icon: 'analytics', label: 'Analytics' },

@@ -8,8 +8,20 @@ import {
   setToken,
   signup as signupRequest,
 } from '../api/index.js'
+import { asIntId } from '../lib/ids.js'
+import { SESSION_EXPIRED_EVENT } from '../lib/token.js'
 
 const UserContext = createContext(null)
+
+/** Keep user.id as an int everywhere so API calls never send a string id. */
+function normalizeUser(me) {
+  if (!me) return null
+  try {
+    return { ...me, id: asIntId(me.id, 'User id') }
+  } catch {
+    return me
+  }
+}
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -22,7 +34,7 @@ export function UserProvider({ children }) {
     let cancelled = false
     fetchMe()
       .then((me) => {
-        if (!cancelled) setUser(me)
+        if (!cancelled) setUser(normalizeUser(me))
       })
       .catch(() => {
         // Expired or rejected token: drop it and fall back to the signed-out UI.
@@ -43,7 +55,7 @@ export function UserProvider({ children }) {
     const { access_token: accessToken } = await request()
     setToken(accessToken)
     try {
-      const me = await fetchMe()
+      const me = normalizeUser(await fetchMe())
       setUser(me)
       return me
     } catch (error) {
@@ -63,7 +75,7 @@ export function UserProvider({ children }) {
   )
 
   const refresh = useCallback(async () => {
-    const me = await fetchMe()
+    const me = normalizeUser(await fetchMe())
     setUser(me)
     return me
   }, [])
@@ -72,6 +84,14 @@ export function UserProvider({ children }) {
     clearToken()
     setUser(null)
   }, [])
+
+  // The API client fires this when the server rejects the stored token, so a
+  // session that dies mid-visit sends the user to sign in instead of failing
+  // every request from then on.
+  useEffect(() => {
+    window.addEventListener(SESSION_EXPIRED_EVENT, logout)
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, logout)
+  }, [logout])
 
   const value = useMemo(
     () => ({

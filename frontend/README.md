@@ -63,6 +63,19 @@ same tokens as `var(--color-*)` references. Add new colors to `index.css` first.
 - `src/api/client.js` — the axios instance every request should go through
 - `src/hooks/useMediaRecorder.js` — microphone/camera capture for interview answers
 - `src/context/UserContext.jsx` — current user state
+- `src/i18n/en.js` — every UI string, so the Amharic, Afaan Oromoo, and Tigrinya
+  translations later are a new file rather than a hunt through components
+
+## Skill Passport
+
+`/passport` reads `GET /passport/me`, which returns the credential already
+aggregated — the page does no score maths of its own. Two fields are ids, not copy:
+`level` and each `milestones[].id` map to labels in `src/i18n/en.js`, so a new band
+or milestone from the backend needs a matching key there.
+
+Scores use the 1-5 rubric and `0` means "not scored yet", which is why they go
+through `src/lib/scores.js` instead of being formatted inline: a zero has to render
+as a dash, never as 0.0.
 
 ## Deployment
 

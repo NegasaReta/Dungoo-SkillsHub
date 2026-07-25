@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import AppShell from '../components/app/AppShell.jsx'
 import NavIcon from '../components/app/NavIcon.jsx'
 import DailyGoalCard from '../components/dashboard/DailyGoalCard.jsx'
@@ -73,13 +75,13 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <button
-        type="button"
-        aria-label="Start a voice session"
+      <Link
+        to="/interview"
+        aria-label="Start AI Interview"
         className="fixed bottom-6 right-6 flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/30 transition-transform hover:scale-105"
       >
         <NavIcon name="mic" />
-      </button>
+      </Link>
     </AppShell>
   )
 }

@@ -17,10 +17,35 @@ const LATENCY_MS = 250
 // Keeps loading and disabled states honest during development.
 const delay = () => new Promise((resolve) => setTimeout(resolve, LATENCY_MS))
 
+function nextUserId(users) {
+  const max = users.reduce((highest, user) => {
+    const id = Number(user.id)
+    return Number.isInteger(id) && id > highest ? id : highest
+  }, 0)
+  return max + 1
+}
+
+/** Older mock users used string ids; rewrite them so /auth/me matches the API. */
+function normalizeUser(user, fallbackId) {
+  const numericId = Number(user.id)
+  const id = Number.isInteger(numericId) && numericId > 0 ? numericId : fallbackId
+  return { ...user, id }
+}
+
 function readUsers() {
   try {
     const parsed = JSON.parse(localStorage.getItem(USERS_KEY) ?? '[]')
-    return Array.isArray(parsed) ? parsed : []
+    if (!Array.isArray(parsed)) return []
+
+    let changed = false
+    const users = parsed.map((user, index) => {
+      const normalized = normalizeUser(user, index + 1)
+      if (normalized.id !== user.id) changed = true
+      return normalized
+    })
+
+    if (changed) writeUsers(users)
+    return users
   } catch {
     return []
   }
@@ -41,7 +66,9 @@ const tokenFor = (user) => `${TOKEN_PREFIX}${user.id}`
 function currentUserIndex(users) {
   const token = getToken()
   if (!token?.startsWith(TOKEN_PREFIX)) return -1
-  return users.findIndex((user) => user.id === token.slice(TOKEN_PREFIX.length))
+  const id = Number(token.slice(TOKEN_PREFIX.length))
+  if (!Number.isInteger(id)) return -1
+  return users.findIndex((user) => user.id === id)
 }
 
 function session(user) {
@@ -68,7 +95,7 @@ export async function signup({ first_name, last_name, email, password }) {
   }
 
   const user = {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id: nextUserId(users),
     email: normalizedEmail,
     password,
     first_name: first_name.trim(),
