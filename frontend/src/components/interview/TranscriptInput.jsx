@@ -16,7 +16,7 @@ export default function TranscriptInput({ value, onChange, disabled }) {
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
         placeholder={t.transcriptPlaceholder}
-        className="mt-3 w-full rounded-lg border border-primary/20 bg-white p-3 text-primary placeholder:text-primary/40 focus:border-brand-blue focus:outline-none disabled:opacity-60"
+        className="mt-3 w-full rounded-lg border border-primary/20 bg-panel p-3 text-primary placeholder:text-primary/40 focus:border-brand-blue focus:outline-none disabled:opacity-60"
       />
     </div>
   )

@@ -120,7 +120,7 @@ export default function InterviewSession() {
     <AppShell>
       <div className="mx-auto max-w-3xl space-y-5">
         <header>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-blue">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-link">
             {t.pageEyebrow}
           </p>
           <h1 className="mt-1 text-3xl font-bold text-primary">{t.pageTitle}</h1>
