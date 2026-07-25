@@ -109,6 +109,7 @@ export async function signup({ first_name, last_name, email, password }) {
     industries: [],
     phone_number: '',
     languages: [],
+    practising_languages: [],
     profile_completed: false,
     created_at: new Date().toISOString(),
   }
@@ -175,6 +176,14 @@ function validateProfile(profile) {
     }
   }
 
+  // Optional, like the server's field: only the values are checked.
+  const unknownPractising = (profile.practising_languages ?? []).filter(
+    (value) => !DEFAULT_OPTIONS.languages.includes(value)
+  )
+  if (unknownPractising.length) {
+    errors.push(`practising_languages: unknown value(s) ${unknownPractising.join(', ')}.`)
+  }
+
   return errors
 }
 
@@ -194,6 +203,7 @@ export async function completeProfile(profile) {
     industries: profile.industries,
     phone_number: profile.phone_number.trim(),
     languages: profile.languages,
+    practising_languages: profile.practising_languages ?? [],
     profile_completed: true,
   }
 
@@ -213,6 +223,30 @@ export async function fetchOptions() {
     industries: DEFAULT_OPTIONS.industries,
     languages: DEFAULT_OPTIONS.languages,
   }
+}
+
+/** Mirrors the server's rules: prove the current password, and pick a new one. */
+export async function changePassword(currentPassword, newPassword) {
+  await delay()
+
+  const users = readUsers()
+  const index = currentUserIndex(users)
+  if (index === -1) throw new Error('Could not validate credentials.')
+
+  if (users[index].password !== currentPassword) {
+    throw new Error('Your current password is not correct.')
+  }
+  if (currentPassword === newPassword) {
+    throw new Error('Your new password must be different from your current one.')
+  }
+
+  const strengthError = validatePasswordStrength(newPassword)
+  if (strengthError) throw new Error(strengthError)
+
+  users[index] = { ...users[index], password: newPassword }
+  writeUsers(users)
+
+  return { message: 'Your password has been changed.' }
 }
 
 const RESETS_KEY = 'dungoo.mock.resets'

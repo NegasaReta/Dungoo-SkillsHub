@@ -9,6 +9,7 @@ import FormAlert from '../auth/FormAlert.jsx'
 import SelectField from '../auth/SelectField.jsx'
 import TextField from '../auth/TextField.jsx'
 import Loader from '../common/Loader.jsx'
+import LanguagePicker from './LanguagePicker.jsx'
 
 function formFromUser(user) {
   return {
@@ -18,6 +19,7 @@ function formFromUser(user) {
     industries: user?.industries ?? [],
     phone_number: user?.phone_number ?? '',
     languages: user?.languages ?? [],
+    practising_languages: user?.practising_languages ?? [],
   }
 }
 
@@ -129,6 +131,7 @@ export default function ProfileForm({
       industries: form.industries,
       phone_number: form.phone_number.trim(),
       languages: form.languages,
+      practising_languages: form.practising_languages,
     }
     if (includeName) {
       payload.first_name = form.first_name.trim()
@@ -206,13 +209,21 @@ export default function ProfileForm({
         onToggle={(value) => toggleMulti('industries', value)}
       />
 
-      <CheckboxGrid
+      <LanguagePicker
         legend="Languages you speak"
-        hint="Choose at least one."
+        hint="Choose at least one. Search by name, native spelling, or another spelling you know."
         options={options.languages}
         selected={form.languages}
         error={fieldErrors.languages}
         onToggle={(value) => toggleMulti('languages', value)}
+      />
+
+      <LanguagePicker
+        legend="Languages you want to practise"
+        hint="Optional. Peer matching pairs these against what your partner already speaks."
+        options={options.languages}
+        selected={form.practising_languages}
+        onToggle={(value) => toggleMulti('practising_languages', value)}
       />
 
       <div className="flex flex-wrap items-center gap-3 border-t border-primary/10 pt-5">

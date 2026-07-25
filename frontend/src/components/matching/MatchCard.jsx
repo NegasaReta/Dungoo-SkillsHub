@@ -1,4 +1,4 @@
-import { humanize } from '../../lib/labels.js'
+import { languageLabel } from '../../data/languages.js'
 import NavIcon from '../app/NavIcon.jsx'
 import Panel from '../dashboard/Panel.jsx'
 
@@ -10,7 +10,7 @@ function ExchangeRow({ icon, label, languages, tone }) {
       <NavIcon name={icon} className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${tone}`} />
       <p className="text-xs text-primary/70">
         <span className="text-primary/50">{label} </span>
-        {languages.map(humanize).join(', ')}
+        {languages.map(languageLabel).join(', ')}
       </p>
     </div>
   )

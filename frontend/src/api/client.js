@@ -119,6 +119,14 @@ export async function fetchOptions() {
   return data
 }
 
+export async function changePassword(currentPassword, newPassword) {
+  const { data } = await client.post('/auth/change-password', {
+    current_password: currentPassword,
+    new_password: newPassword,
+  })
+  return data
+}
+
 export async function requestPasswordReset(email) {
   const { data } = await client.post('/auth/forgot-password', { email })
   return data

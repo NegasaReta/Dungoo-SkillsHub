@@ -8,6 +8,7 @@
  * star_score on the 1-5 rubric.
  */
 import { ROLES, SCORE_MAX } from '../constants.js'
+import { languageLabel } from '../data/languages.js'
 import { humanize } from './labels.js'
 
 export const AXES = [
@@ -427,6 +428,8 @@ export function passportId(user) {
 }
 
 const list = (values = []) => values.map(humanize).filter(Boolean).join(' · ')
+// Languages have proper names and native spellings, so they are not humanised slugs.
+const languageList = (values = []) => values.map(languageLabel).filter(Boolean).join(' · ')
 
 /**
  * The credential header. Everything shown comes from the account profile or from
@@ -440,7 +443,7 @@ export function buildPassport(user, summary) {
     passportId: passportId(user),
     role: practiced[0] ?? (industries.length ? `${humanize(industries[0])} track` : 'Career starter'),
     target: list(industries) || 'Not set yet',
-    languages: list(user?.languages) || 'Not set yet',
+    languages: languageList(user?.languages) || 'Not set yet',
     tier: tierFor(summary.overall),
     verified: summary.hasHistory,
     summary: summary.hasHistory

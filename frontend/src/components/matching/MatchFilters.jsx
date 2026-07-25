@@ -3,11 +3,11 @@ import {
   MATCHING_INDUSTRIES,
   SKILL_LEVELS,
 } from '../../data/matching.js'
-import { humanize } from '../../lib/labels.js'
+import { languageLabel } from '../../data/languages.js'
 import NavIcon from '../app/NavIcon.jsx'
 import Panel from '../dashboard/Panel.jsx'
 
-function LanguagePicker({ id, title, hint, selected, onToggle }) {
+function LanguageFilter({ id, title, hint, selected, onToggle }) {
   return (
     <Panel>
       <h2 className="text-sm font-semibold text-primary">{title}</h2>
@@ -23,7 +23,7 @@ function LanguagePicker({ id, title, hint, selected, onToggle }) {
                 checked={selected.includes(language)}
                 onChange={() => onToggle(language)}
               />
-              {humanize(language)}
+              {languageLabel(language)}
             </label>
           </li>
         ))}
@@ -45,7 +45,7 @@ export default function MatchFilters({ filters, onChange }) {
 
   return (
     <aside className="space-y-4">
-      <LanguagePicker
+      <LanguageFilter
         id="speaks"
         title="You speak"
         hint="What you can offer a partner"
@@ -53,7 +53,7 @@ export default function MatchFilters({ filters, onChange }) {
         onToggle={toggle('speaks')}
       />
 
-      <LanguagePicker
+      <LanguageFilter
         id="wants"
         title="You want to practise"
         hint="What you are looking for"
