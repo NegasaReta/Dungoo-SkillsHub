@@ -99,6 +99,162 @@ with httpx.Client(base_url=BASE_URL, timeout=15.0) as client:
     )
     check("10. POST /auth/signup password < 8 chars -> 422", r.status_code == 422, r.status_code)
 
+    # The merged frontend's exact request shapes: names split in two, sent at
+    # signup, omitted by the onboarding step, resent when settings edits them.
+    fe_email = f"frontend.{uuid.uuid4().hex[:8]}@example.com"
+    r = client.post(
+        "/auth/signup",
+        json={
+            "first_name": "Hana",
+            "last_name": "Tesfaye",
+            "email": fe_email,
+            "password": "Str0ng!pass",
+        },
+    )
+    body = r.json()
+    fe_headers = {"Authorization": f"Bearer {body.get('access_token', '')}"}
+    check("11. Signup with first_name/last_name -> 201", r.status_code == 201, r.status_code)
+
+    body = client.get("/auth/me", headers=fe_headers).json()
+    check(
+        "12. GET /auth/me returns split names",
+        (body.get("first_name"), body.get("last_name"), body.get("full_name"))
+        == ("Hana", "Tesfaye", "Hana Tesfaye"),
+        (body.get("full_name"), body.get("first_name"), body.get("last_name")),
+    )
+
+    r = client.post(
+        "/profile/complete",
+        json={
+            "education_level": "diploma",
+            "industries": ["health"],
+            "phone_number": "0912 345 678",
+            "languages": ["amharic"],
+        },
+        headers=fe_headers,
+    )
+    body = r.json()
+    check(
+        "13. Onboarding payload without a name -> 200, keeps signup name",
+        r.status_code == 200 and body.get("full_name") == "Hana Tesfaye",
+        (r.status_code, body.get("full_name")),
+    )
+    check(
+        "14. Local phone 0912 345 678 normalized to E.164",
+        body.get("phone_number") == "+251912345678",
+        body.get("phone_number"),
+    )
+
+    r = client.post(
+        "/profile/complete",
+        json={
+            "first_name": "Hanna",
+            "last_name": "Tesfaye Bekele",
+            "education_level": "diploma",
+            "industries": ["health"],
+            "phone_number": "+251912345678",
+            "languages": ["amharic"],
+        },
+        headers=fe_headers,
+    )
+    body = r.json()
+    check(
+        "15. Settings payload with split names round-trips",
+        r.status_code == 200
+        and body.get("full_name") == "Hanna Tesfaye Bekele"
+        and body.get("first_name") == "Hanna"
+        and body.get("last_name") == "Tesfaye Bekele",
+        (r.status_code, body.get("full_name"), body.get("first_name"), body.get("last_name")),
+    )
+
+    # A user who never supplied a name must still be asked for one.
+    nameless = client.post(
+        "/auth/signup",
+        json={"email": f"nameless.{uuid.uuid4().hex[:8]}@example.com", "password": "supersecret123"},
+    ).json()
+    r = client.post(
+        "/profile/complete",
+        json={
+            "education_level": "bachelor",
+            "industries": ["tech"],
+            "phone_number": "+251912345678",
+            "languages": ["english"],
+        },
+        headers={"Authorization": f"Bearer {nameless.get('access_token', '')}"},
+    )
+    check("16. Nameless account without a name -> 422", r.status_code == 422, r.status_code)
+
+    r = client.post(
+        "/profile/complete",
+        json={
+            "education_level": "bachelor",
+            "industries": ["tech"],
+            "phone_number": "12345",
+            "languages": ["english"],
+        },
+        headers=fe_headers,
+    )
+    check("17. Implausible phone number -> 422", r.status_code == 422, r.status_code)
+
+    # Password reset. Needs DEV_EXPOSE_RESET_TOKEN=true to read the token back;
+    # otherwise it is only written to the server log.
+    r = client.post("/auth/forgot-password", json={"email": fe_email})
+    body = r.json()
+    reset_token = body.get("reset_token")
+    check(
+        "18. Forgot password for a known email -> 200",
+        r.status_code == 200 and bool(body.get("message")),
+        r.status_code,
+    )
+
+    unknown = client.post(
+        "/auth/forgot-password",
+        json={"email": f"ghost.{uuid.uuid4().hex[:8]}@example.com"},
+    )
+    check(
+        "19. Unknown email answers identically (no account enumeration)",
+        unknown.status_code == 200 and unknown.json().get("message") == body.get("message"),
+        unknown.status_code,
+    )
+
+    if not reset_token:
+        check(
+            "20-23. Reset token checks (needs DEV_EXPOSE_RESET_TOKEN=true)",
+            False,
+            "no reset_token returned",
+        )
+    else:
+        r = client.post(
+            "/auth/reset-password", json={"token": reset_token, "new_password": "short"}
+        )
+        check("20. Reset with a short password -> 422", r.status_code == 422, r.status_code)
+
+        r = client.post(
+            "/auth/reset-password",
+            json={"token": reset_token, "new_password": "Rotated!pass1"},
+        )
+        check("21. Reset with a valid token -> 200", r.status_code == 200, r.status_code)
+
+        r = client.post(
+            "/auth/login", json={"email": fe_email, "password": "Rotated!pass1"}
+        )
+        check("22. Login with the new password -> 200", r.status_code == 200, r.status_code)
+
+        r = client.post("/auth/login", json={"email": fe_email, "password": "Str0ng!pass"})
+        check("23. Old password no longer works -> 401", r.status_code == 401, r.status_code)
+
+        r = client.post(
+            "/auth/reset-password",
+            json={"token": reset_token, "new_password": "Another!pass1"},
+        )
+        check("24. Reset token cannot be reused -> 400", r.status_code == 400, r.status_code)
+
+    r = client.post(
+        "/auth/reset-password",
+        json={"token": "not-a-real-token", "new_password": "Whatever!pass1"},
+    )
+    check("25. Made-up reset token -> 400", r.status_code == 400, r.status_code)
+
 print()
 if failures:
     print(f"{len(failures)} check(s) failed: {failures}")

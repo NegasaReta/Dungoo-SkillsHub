@@ -4,12 +4,12 @@ export default function ProgressSummary({ sessionsCompleted = 0, averageScore = 
   return (
     <Card className="flex gap-8">
       <div>
-        <p className="text-sm text-slate-500">Sessions</p>
-        <p className="text-2xl font-semibold">{sessionsCompleted}</p>
+        <p className="text-sm text-primary/60">Sessions</p>
+        <p className="text-2xl font-semibold text-primary">{sessionsCompleted}</p>
       </div>
       <div>
-        <p className="text-sm text-slate-500">Average score</p>
-        <p className="text-2xl font-semibold">{averageScore.toFixed(1)}</p>
+        <p className="text-sm text-primary/60">Average score</p>
+        <p className="text-2xl font-semibold text-accent">{averageScore.toFixed(1)}</p>
       </div>
     </Card>
   )
