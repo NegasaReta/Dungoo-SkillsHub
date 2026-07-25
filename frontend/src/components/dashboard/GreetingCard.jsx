@@ -41,8 +41,8 @@ export default function GreetingCard({ greeting, name, sessionsRemaining, focusA
             to="/interview"
             className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-blue/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
           >
-            <NavIcon name="play" className="h-4 w-4" />
-            Start practising
+            <NavIcon name="mic" className="h-4 w-4" />
+            Start AI Interview
           </Link>
           <Link
             to="/passport"
