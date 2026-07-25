@@ -1,78 +1,109 @@
 import { SCORE_MAX } from '../../constants.js'
+import useTilt from '../../hooks/useTilt.js'
+import { format, strings } from '../../i18n/en.js'
+import Reveal from '../common/Reveal.jsx'
+import Icon from './Icon.jsx'
 
 const SKILLS = [
-  { label: 'Clarity', value: 4.2 },
-  { label: 'Confidence', value: 3.6 },
-  { label: 'STAR structure', value: 4.5 },
+  { key: 'clarity', value: 4.2 },
+  { key: 'confidence', value: 3.6 },
+  { key: 'star', value: 4.5 },
 ]
 
 const AVERAGE_SCORE = SKILLS.reduce((total, skill) => total + skill.value, 0) / SKILLS.length
 
-const BENEFITS = [
-  'Built automatically from real practice sessions, not self-reported claims.',
-  'Shows growth over time, so effort is visible even before the first job offer.',
-  'Gives employers a readiness signal for candidates they would otherwise never screen.',
-]
-
 export default function PassportPreview() {
+  const t = strings.landing.passport
+  const labels = strings.landing.scoreLabels
+  const { ref, tiltProps } = useTilt({ max: 10 })
+
   return (
-    <section id="passport" className="py-16 md:py-24">
-      <div className="mx-auto grid max-w-6xl gap-12 px-4 lg:grid-cols-2 lg:items-center">
-        <div>
-          <p className="font-medium text-brand-blue">Skill Passport</p>
-          <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">
-            Proof you can point to, not a promise you have to make
-          </h2>
-          <p className="mt-4 text-primary/70">
-            Employers can&apos;t interview everyone, so capable youth stay invisible. The Skill
-            Passport turns your practice history into a verifiable credential — one link that shows
-            what you have worked on and how far you have come.
-          </p>
+    <section id="passport" className="relative overflow-hidden bg-canvas py-16 md:py-24">
+      <div
+        aria-hidden="true"
+        className="orb orb-blue pointer-events-none absolute -right-24 top-1/4 h-80 w-80"
+      />
+
+      <div className="relative mx-auto grid max-w-6xl gap-14 px-4 lg:grid-cols-2 lg:items-center">
+        <Reveal>
+          <p className="font-medium text-link">{t.eyebrow}</p>
+          <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">{t.title}</h2>
+          <p className="mt-4 leading-relaxed text-primary/70">{t.body}</p>
 
           <ul className="mt-8 space-y-4">
-            {BENEFITS.map((benefit) => (
+            {t.benefits.map((benefit) => (
               <li key={benefit} className="flex gap-3 text-primary/80">
-                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-accent" />
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent">
+                  <Icon name="check" className="h-3.5 w-3.5" />
+                </span>
                 {benefit}
               </li>
             ))}
           </ul>
-        </div>
+        </Reveal>
 
-        <div className="rounded-2xl border border-primary/10 bg-white p-7 shadow-lg">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-primary/60">Skill Passport</p>
-              <p className="text-xl font-semibold text-primary">Junior Software Engineer</p>
-            </div>
-            <span className="rounded-full bg-accent px-3 py-1 text-sm font-semibold text-primary">
-              {AVERAGE_SCORE.toFixed(1)} / {SCORE_MAX} avg
-            </span>
-          </div>
+        <div ref={ref} {...tiltProps} className="scene-3d">
+          <div className="tilt-3d relative">
+            {/* Holographic rim, offset so it reads as light bleeding out from
+                behind the card rather than a border on it. */}
+            <div
+              aria-hidden="true"
+              className="holo-edge pointer-events-none absolute -inset-[2px] rounded-[1.6rem] opacity-70 blur-[2px]"
+            />
+            <div
+              aria-hidden="true"
+              className="holo-edge pointer-events-none absolute -inset-6 rounded-[2rem] opacity-30 blur-2xl"
+            />
 
-          <div className="mt-7 space-y-5">
-            {SKILLS.map((skill) => (
-              <div key={skill.label}>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-primary/70">{skill.label}</span>
-                  <span className="font-semibold text-primary">
-                    {skill.value.toFixed(1)}
-                    <span className="font-normal text-primary/50"> / {SCORE_MAX}</span>
-                  </span>
+            {/* The credential itself sits on the navy brand surface so it reads
+                as an object rather than another page section. */}
+            <div className="sheen relative overflow-hidden rounded-3xl border border-white/10 bg-navy p-7 text-white shadow-2xl shadow-navy/30">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-accent/20 blur-3xl"
+              />
+
+              <div className="relative flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm text-white/60">{t.cardLabel}</p>
+                  <p className="text-xl font-semibold">{t.cardRole}</p>
                 </div>
-                <div className="mt-1.5 h-2 rounded-full bg-surface">
-                  <div
-                    className="h-2 rounded-full bg-brand-blue"
-                    style={{ width: `${(skill.value / SCORE_MAX) * 100}%` }}
-                  />
-                </div>
+                <span className="depth-2 shrink-0 rounded-full bg-accent px-3 py-1 text-sm font-semibold text-navy shadow-lg shadow-accent/30">
+                  {format(t.cardAverage, {
+                    score: AVERAGE_SCORE.toFixed(1),
+                    max: SCORE_MAX,
+                  })}
+                </span>
               </div>
-            ))}
-          </div>
 
-          <div className="mt-7 flex justify-between border-t border-primary/10 pt-5 text-sm">
-            <span className="text-primary/60">6 sessions completed</span>
-            <span className="font-medium text-brand-blue">Verified by Dungoo</span>
+              <div className="relative mt-7 space-y-5">
+                {SKILLS.map((skill) => (
+                  <div key={skill.key}>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/70">{labels[skill.key]}</span>
+                      <span className="font-semibold">
+                        {skill.value.toFixed(1)}
+                        <span className="font-normal text-white/50"> / {SCORE_MAX}</span>
+                      </span>
+                    </div>
+                    <div className="mt-1.5 h-2 rounded-full bg-white/15">
+                      <div
+                        className="h-2 rounded-full bg-accent"
+                        style={{ width: `${(skill.value / SCORE_MAX) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="relative mt-7 flex items-center justify-between border-t border-white/15 pt-5 text-sm">
+                <span className="text-white/60">{t.cardSessions}</span>
+                <span className="inline-flex items-center gap-1.5 font-medium text-accent">
+                  <Icon name="shield" className="h-4 w-4" />
+                  {t.cardVerified}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

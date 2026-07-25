@@ -1,7 +1,7 @@
 export default function RoleSelect({ roles = [], value, onChange }) {
   return (
     <select
-      className="rounded-lg border border-primary/20 bg-white px-3 py-2 text-primary"
+      className="rounded-lg border border-primary/20 bg-panel px-3 py-2 text-primary outline-none transition-colors focus:border-brand-blue"
       value={value ?? ''}
       onChange={(event) => onChange?.(event.target.value)}
     >

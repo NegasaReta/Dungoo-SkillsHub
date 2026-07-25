@@ -1,7 +1,7 @@
 const TONES = {
-  error: 'border-red-200 bg-red-50 text-red-700',
+  error: 'border-danger/35 bg-danger/10 text-danger',
   warning: 'border-accent/40 bg-accent/10 text-primary',
-  success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+  success: 'border-success/35 bg-success/10 text-success',
 }
 
 export default function FormAlert({ children, tone = 'error' }) {

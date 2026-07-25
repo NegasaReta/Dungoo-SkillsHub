@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import AppShell from '../components/app/AppShell.jsx'
 import NavIcon from '../components/app/NavIcon.jsx'
 import Loader from '../components/common/Loader.jsx'
+import Reveal from '../components/common/Reveal.jsx'
 import Panel from '../components/dashboard/Panel.jsx'
 import CredentialsGrid from '../components/passport/CredentialsGrid.jsx'
 import GrowthMilestones from '../components/passport/GrowthMilestones.jsx'
@@ -51,7 +52,7 @@ export default function SkillPassport() {
       <div className="space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-blue">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-link">
               Personal profile
             </p>
             <h1 className="mt-1 text-3xl font-bold text-primary">Skill Passport</h1>
@@ -66,7 +67,7 @@ export default function SkillPassport() {
               type="button"
               onClick={share}
               disabled={!summary.hasHistory}
-              className="inline-flex items-center gap-2 rounded-lg border border-primary/15 bg-white px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-primary/15 bg-panel px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
             >
               <NavIcon name={shared ? 'verified' : 'share'} className="h-4 w-4" />
               {shared ? 'Copied' : 'Share'}
@@ -91,21 +92,21 @@ export default function SkillPassport() {
             {!summary.hasHistory && <EmptyPassportNotice />}
 
             <div className="grid gap-5 lg:grid-cols-12">
-              <div className="lg:col-span-7">
+              <Reveal className="lg:col-span-7">
                 <ProfileHeader user={user} passport={passport} />
-              </div>
-              <div className="lg:col-span-5">
+              </Reveal>
+              <Reveal delay={90} className="lg:col-span-5">
                 <SkillsProficiency
                   scores={passportScores(summary)}
                   hasHistory={summary.hasHistory}
                 />
-              </div>
-              <div className="lg:col-span-7">
+              </Reveal>
+              <Reveal delay={140} className="lg:col-span-7">
                 <CredentialsGrid credentials={deriveCredentials(summary)} />
-              </div>
-              <div className="lg:col-span-5">
+              </Reveal>
+              <Reveal delay={190} className="lg:col-span-5">
                 <GrowthMilestones milestones={deriveMilestones(summary, sessions, user)} />
-              </div>
+              </Reveal>
             </div>
           </>
         )}

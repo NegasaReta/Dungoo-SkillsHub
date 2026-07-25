@@ -10,6 +10,9 @@ export const brandColors = {
   accent: 'var(--color-accent)',
   brandBlue: 'var(--color-brand-blue)',
   surface: 'var(--color-surface)',
+  panel: 'var(--color-panel)',
   success: 'var(--color-success)',
+  warning: 'var(--color-warning)',
+  danger: 'var(--color-danger)',
   track: 'var(--color-track)',
 }

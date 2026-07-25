@@ -2,12 +2,12 @@ import { passwordStrength } from '../../lib/validation.js'
 
 // Indexed by how many rules are met, so the class names stay static for Tailwind.
 const TONES = [
-  { bar: 'bg-red-500', text: 'text-red-600' },
-  { bar: 'bg-red-500', text: 'text-red-600' },
-  { bar: 'bg-orange-500', text: 'text-orange-600' },
-  { bar: 'bg-amber-500', text: 'text-amber-600' },
-  { bar: 'bg-lime-500', text: 'text-lime-700' },
-  { bar: 'bg-green-600', text: 'text-green-700' },
+  { bar: 'bg-danger', text: 'text-danger' },
+  { bar: 'bg-danger', text: 'text-danger' },
+  { bar: 'bg-warning', text: 'text-warning' },
+  { bar: 'bg-warning', text: 'text-warning' },
+  { bar: 'bg-accent', text: 'text-warning' },
+  { bar: 'bg-success', text: 'text-success' },
 ]
 
 export default function PasswordStrengthMeter({ value }) {

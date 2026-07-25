@@ -3,8 +3,12 @@ import Panel from './Panel.jsx'
 
 export default function StreakCard({ days, weekProgress }) {
   return (
-    <Panel className="flex h-full flex-col items-center justify-center text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-accent/15 text-accent ring-1 ring-accent/30">
+    <Panel lift className="relative flex h-full flex-col items-center justify-center overflow-hidden text-center">
+      <div
+        aria-hidden="true"
+        className="orb orb-accent pointer-events-none absolute -top-16 h-40 w-40 opacity-70"
+      />
+      <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-accent/15 text-accent ring-1 ring-accent/30">
         <NavIcon name="leaf" className="h-7 w-7" />
       </span>
 

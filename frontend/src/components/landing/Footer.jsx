@@ -1,8 +1,12 @@
-const LANGUAGES = ['Amharic', 'Afaan Oromoo', 'Tigrinya', 'English']
+import { Link } from 'react-router-dom'
+
+import { format, strings } from '../../i18n/en.js'
 
 export default function Footer() {
+  const t = strings.landing.footer
+
   return (
-    <footer className="border-t border-primary/10 bg-white">
+    <footer className="border-t border-primary/10 bg-panel">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="flex flex-col justify-between gap-8 md:flex-row">
           <div className="max-w-sm">
@@ -11,53 +15,42 @@ export default function Footer() {
                 D
               </span>
               <span className="font-semibold text-primary">
-                Dungoo <span className="text-brand-blue">SkillsHub</span>
+                Dungoo <span className="text-link">SkillsHub</span>
               </span>
             </div>
-            <p className="mt-4 text-sm text-primary/60">
-              AI-powered career readiness for Ethiopian youth. A product of Dungoo Software
-              Solutions.
-            </p>
+            <p className="mt-4 text-sm leading-relaxed text-primary/60">{t.tagline}</p>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-primary">Available in</h3>
+            <h3 className="text-sm font-semibold text-primary">{t.languagesTitle}</h3>
             <ul className="mt-4 space-y-2 text-sm text-primary/60">
-              {LANGUAGES.map((language) => (
+              {t.languages.map((language) => (
                 <li key={language}>{language}</li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-primary">Platform</h3>
+            <h3 className="text-sm font-semibold text-primary">{t.platformTitle}</h3>
             <ul className="mt-4 space-y-2 text-sm text-primary/60">
+              {strings.landing.nav.links.map((link) => (
+                <li key={link.href}>
+                  <a href={link.href} className="transition-colors hover:text-link">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
               <li>
-                <a href="#how-it-works" className="hover:text-brand-blue">
-                  How it works
-                </a>
-              </li>
-              <li>
-                <a href="#features" className="hover:text-brand-blue">
-                  Features
-                </a>
-              </li>
-              <li>
-                <a href="#passport" className="hover:text-brand-blue">
-                  Skill Passport
-                </a>
-              </li>
-              <li>
-                <a href="#why" className="hover:text-brand-blue">
-                  Why Dungoo
-                </a>
+                <Link to="/signup" className="transition-colors hover:text-link">
+                  {strings.landing.nav.signup}
+                </Link>
               </li>
             </ul>
           </div>
         </div>
 
         <p className="mt-10 border-t border-primary/10 pt-6 text-sm text-primary/50">
-          © {new Date().getFullYear()} Dungoo Software Solutions. All rights reserved.
+          {format(t.rights, { year: new Date().getFullYear() })}
         </p>
       </div>
     </footer>

@@ -18,14 +18,14 @@ function ExchangeRow({ icon, label, languages, tone }) {
 
 export default function MatchCard({ match, onStart, disabled }) {
   return (
-    <Panel className="flex h-full flex-col">
+    <Panel spotlight lift className="sheen flex h-full flex-col">
       <div className="flex items-start justify-between gap-3">
         <div className="relative">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue/10 text-sm font-semibold text-brand-blue">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue/10 text-sm font-semibold text-link">
             {match.initials}
           </span>
           <span
-            className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ring-2 ring-white ${
+            className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ring-2 ring-panel ${
               match.online ? 'bg-success' : 'bg-primary/25'
             }`}
             aria-label={match.online ? 'Online' : 'Offline'}
@@ -37,7 +37,7 @@ export default function MatchCard({ match, onStart, disabled }) {
           </span>
           <span
             className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
-              match.mutual ? 'bg-accent/20 text-primary' : 'bg-surface text-primary/55'
+              match.mutual ? 'bg-accent/20 text-primary' : 'bg-surface text-primary/60'
             }`}
           >
             {match.mutual ? 'Mutual exchange' : 'One-way'}
@@ -56,7 +56,7 @@ export default function MatchCard({ match, onStart, disabled }) {
           icon="arrow"
           label="Can teach you"
           languages={match.teaches}
-          tone="text-brand-blue"
+          tone="text-link"
         />
         <ExchangeRow
           icon="arrow"
@@ -78,7 +78,7 @@ export default function MatchCard({ match, onStart, disabled }) {
         <button
           type="button"
           aria-label={`Message ${match.name}`}
-          className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/15 text-primary/70 transition-colors hover:border-brand-blue/40 hover:text-brand-blue"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/15 text-primary/70 transition-colors hover:border-brand-blue/40 hover:text-link"
         >
           <NavIcon name="message" className="h-4 w-4" />
         </button>

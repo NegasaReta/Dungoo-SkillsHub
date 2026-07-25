@@ -5,13 +5,13 @@ export default function QuestionCard({ index, total, question }) {
   const t = strings.interview
 
   return (
-    <Card>
+    <Card className="border-l-2 border-l-accent">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-primary/60">
           {format(t.questionProgress, { current: index + 1, total })}
         </p>
         {question?.competency && (
-          <span className="rounded-full bg-brand-blue/10 px-2.5 py-1 text-xs font-medium text-brand-blue">
+          <span className="rounded-full bg-brand-blue/10 px-2.5 py-1 text-xs font-medium text-link">
             {question.competency}
           </span>
         )}

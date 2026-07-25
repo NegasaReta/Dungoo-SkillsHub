@@ -1,7 +1,11 @@
 import AppShell from '../components/app/AppShell.jsx'
+import NavIcon from '../components/app/NavIcon.jsx'
 import Panel from '../components/dashboard/Panel.jsx'
+import ThemeChoice from '../components/common/ThemeChoice.jsx'
+import AvatarUploader from '../components/profile/AvatarUploader.jsx'
 import ProfileForm from '../components/profile/ProfileForm.jsx'
 import { useUser } from '../context/UserContext.jsx'
+import { strings } from '../i18n/en.js'
 
 export default function Settings() {
   const { user, profileCompleted, logout } = useUser()
@@ -10,11 +14,26 @@ export default function Settings() {
     <AppShell>
       <div className="mx-auto max-w-3xl space-y-5">
         <div>
-          <h1 className="text-2xl font-semibold text-primary">Settings</h1>
-          <p className="mt-1 text-sm text-primary/60">
-            Manage your profile and account details.
-          </p>
+          <h1 className="text-2xl font-semibold text-primary">{strings.settings.title}</h1>
+          <p className="mt-1 text-sm text-primary/60">{strings.settings.subtitle}</p>
         </div>
+
+        <Panel>
+          <h2 className="text-base font-semibold text-primary">{strings.settings.photoTitle}</h2>
+          <div className="mt-4">
+            <AvatarUploader />
+          </div>
+        </Panel>
+
+        <Panel>
+          <h2 className="text-base font-semibold text-primary">
+            {strings.settings.appearanceTitle}
+          </h2>
+          <p className="mt-1 text-sm text-primary/60">{strings.theme.description}</p>
+          <div className="mt-4">
+            <ThemeChoice />
+          </div>
+        </Panel>
 
         <Panel>
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -71,9 +90,10 @@ export default function Settings() {
           <button
             type="button"
             onClick={logout}
-            className="mt-4 rounded-lg border border-primary/15 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-surface"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-primary/15 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
           >
-            Sign out
+            <NavIcon name="logout" className="h-4 w-4" />
+            {strings.account.signOut}
           </button>
         </Panel>
       </div>

@@ -15,7 +15,11 @@ export default function VideoPreview({ stream, blobUrl }) {
   const showPlayback = !stream && blobUrl
 
   return (
-    <div className="aspect-video overflow-hidden rounded-xl bg-primary">
+    <div
+      className={`aspect-video overflow-hidden rounded-xl bg-navy transition-shadow duration-500 ${
+        stream ? 'ring-1 ring-danger/40 shadow-lg shadow-danger/20' : ''
+      }`}
+    >
       {stream || showPlayback ? (
         <video
           ref={videoRef}

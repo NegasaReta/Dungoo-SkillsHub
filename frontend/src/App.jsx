@@ -3,6 +3,8 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 
 import DemoModeBadge from './components/common/DemoModeBadge.jsx'
 import Loader from './components/common/Loader.jsx'
+import { AvatarProvider } from './context/AvatarContext.jsx'
+import { ThemeProvider } from './context/ThemeContext.jsx'
 import { UserProvider, useUser } from './context/UserContext.jsx'
 import Landing from './pages/Landing.jsx'
 import Login from './pages/Login.jsx'
@@ -23,7 +25,7 @@ const SkillPassport = lazy(() => import('./pages/SkillPassport.jsx'))
 
 function ScreenLoader() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-surface">
+    <main className="flex min-h-screen items-center justify-center bg-canvas">
       <Loader />
     </main>
   )
@@ -177,11 +179,15 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <UserProvider>
-      <Suspense fallback={<ScreenLoader />}>
-        <AppRoutes />
-      </Suspense>
-      <DemoModeBadge />
-    </UserProvider>
+    <ThemeProvider>
+      <UserProvider>
+        <AvatarProvider>
+          <Suspense fallback={<ScreenLoader />}>
+            <AppRoutes />
+          </Suspense>
+          <DemoModeBadge />
+        </AvatarProvider>
+      </UserProvider>
+    </ThemeProvider>
   )
 }

@@ -1,15 +1,386 @@
 @import 'tailwindcss';
 
-/* Dungoo brand palette. Single source of truth for both utilities and charts. */
-@theme {
-  --color-primary: #0f172a;
-  --color-accent: #f59e0b;
-  --color-brand-blue: #1b4a8f;
-  --color-surface: #f4f7fb;
+/*
+ * Dark mode is class-driven (`<html class="dark">`) rather than
+ * `prefers-color-scheme`, so the in-app toggle can override the OS setting.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
 
-  /* Signed-in app: success states and hairline strokes on white panels. */
-  --color-success: #0f8a5f;
-  --color-track: #e2e8f2;
+/*
+ * Dungoo brand palette, in two parts.
+ *
+ * The raw values live on `:root` as `--dg-*` and are the only thing the dark
+ * theme swaps. The `@theme` block below then *points* at them rather than
+ * repeating the hex. That indirection is load-bearing: given a literal hex,
+ * Tailwind v4 precomputes opacity modifiers at build time, so `text-primary/60`
+ * would compile to a frozen `#0f172a99` and stay dark navy in dark mode. Behind
+ * a `var()` it has to emit a `color-mix()` against the live variable instead,
+ * which is what lets muted text and hairline borders follow the theme.
+ *
+ * Semantic roles, on top of the brand colours:
+ *   canvas - page background behind panels
+ *   panel  - card / panel background
+ *   navy   - surfaces that stay dark navy in both themes, plus the ink used
+ *            on top of gold `accent` fills
+ *   link   - inline link + hover ink
+ *   track  - unfilled part of a progress bar or meter
+ */
+:root {
+  --dg-primary: #0f172a;
+  --dg-accent: #f59e0b;
+  --dg-brand-blue: #1b4a8f;
+  --dg-surface: #f4f7fb;
+
+  --dg-success: #0f8a5f;
+  --dg-warning: #b54708;
+  --dg-danger: #b42318;
+  --dg-track: #e2e8f2;
+
+  --dg-canvas: #f4f7fb;
+  --dg-panel: #ffffff;
+  --dg-navy: #0f172a;
+  --dg-link: #1b4a8f;
+}
+
+/*
+ * Dark theme. `primary` inverts because it is the app's body-ink token, so
+ * every `text-primary`, `text-primary/60` and `border-primary/10` follows from
+ * this one line. Values are navy-derived tints of the brand palette, lifted
+ * enough to clear 4.5:1 on the `panel` and `surface` backgrounds.
+ */
+.dark {
+  --dg-primary: #eaeff8;
+  --dg-surface: #1b2740;
+  --dg-track: #2a3852;
+  --dg-success: #34d399;
+  --dg-warning: #fdb022;
+  --dg-danger: #f97066;
+  /* Lifted for dark surfaces, but kept dark enough that white button labels
+     still clear 4.5:1 on a solid `bg-brand-blue` fill. */
+  --dg-brand-blue: #2f6ac4;
+
+  --dg-canvas: #070b14;
+  --dg-panel: #111c31;
+  --dg-navy: #0f172a;
+  --dg-link: #8fbcf7;
+}
+
+@theme {
+  --color-primary: var(--dg-primary);
+  --color-accent: var(--dg-accent);
+  --color-brand-blue: var(--dg-brand-blue);
+  --color-surface: var(--dg-surface);
+
+  --color-success: var(--dg-success);
+  --color-warning: var(--dg-warning);
+  --color-danger: var(--dg-danger);
+  --color-track: var(--dg-track);
+
+  --color-canvas: var(--dg-canvas);
+  --color-panel: var(--dg-panel);
+  --color-navy: var(--dg-navy);
+  --color-link: var(--dg-link);
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+/*
+ * Theme swaps repaint the whole tree, so transition only the properties that
+ * actually change and skip it entirely for reduced-motion users.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .theme-transition,
+  .theme-transition *,
+  .theme-transition *::before,
+  .theme-transition *::after {
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease,
+      fill 200ms ease,
+      stroke 200ms ease;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Depth + 3D primitives, shared by the landing page and the signed-in app.
+ * Pure CSS transforms and gradients — no 3D library, and every animated rule
+ * sits behind a reduced-motion guard.
+ * ------------------------------------------------------------------------- */
+
+.scene-3d {
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+}
+
+/*
+ * Frosted panel. Sits between `bg-panel` and the page so stacked cards read as
+ * separate sheets of glass. Falls back to a solid panel where backdrop-filter
+ * is unsupported, which keeps text legible on older Android webviews.
+ */
+.glass {
+  /* Solid base first: this card holds real content, so it must never end up
+     transparent on a browser that cannot resolve the translucent version. */
+  background-color: var(--dg-panel);
+  border: 1px solid var(--dg-track);
+}
+
+@supports (background: color-mix(in srgb, red, red)) and (backdrop-filter: blur(1px)) {
+  .glass {
+    background-color: color-mix(in srgb, var(--dg-panel) 62%, transparent);
+    border-color: color-mix(in srgb, var(--dg-primary) 12%, transparent);
+    backdrop-filter: blur(16px) saturate(1.35);
+  }
+}
+
+/*
+ * Soft coloured light source. Sized and positioned by utilities at the call
+ * site; `--orb` picks the hue. Purely decorative, so always aria-hidden.
+ */
+.orb {
+  background-image: radial-gradient(circle at 30% 30%, var(--orb), transparent 70%);
+  filter: blur(48px);
+}
+
+.orb-accent {
+  --orb: color-mix(in srgb, var(--dg-accent) 55%, transparent);
+}
+
+.orb-blue {
+  --orb: color-mix(in srgb, var(--dg-brand-blue) 60%, transparent);
+}
+
+/* Hover elevation. Transform-only so it stays on the compositor. */
+.lift {
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms ease,
+    border-color 260ms ease;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 45px -22px color-mix(in srgb, var(--dg-navy) 55%, transparent);
+  }
+}
+
+/*
+ * Specular sweep across a card on hover. The gradient is masked to the element
+ * and slides on `translate`, so it never triggers layout.
+ */
+.sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    color-mix(in srgb, var(--dg-accent) 22%, transparent) 50%,
+    transparent 65%
+  );
+  translate: -120% 0;
+  opacity: 0;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .sheen:hover::after {
+    translate: 120% 0;
+    opacity: 1;
+    transition:
+      translate 900ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 900ms ease;
+  }
+}
+
+/*
+ * Pointer-tracked highlight. Reads the --sx / --sy percentages that `useTilt`
+ * writes, so one hook can both tilt a card and move the light across it.
+ */
+.spotlight {
+  position: relative;
+  /* Own stacking context, so the highlight can sit at z-index -1: behind the
+     card's text but still in front of its background. */
+  isolation: isolate;
+}
+
+.spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 260ms ease;
+  background: radial-gradient(
+    22rem circle at var(--sx, 50%) var(--sy, 50%),
+    color-mix(in srgb, var(--dg-accent) 16%, transparent),
+    transparent 60%
+  );
+}
+
+@media (hover: hover) {
+  .spotlight:hover::before {
+    opacity: 1;
+  }
+}
+
+/* Holographic edge for the Skill Passport credential. */
+.holo-edge {
+  background-image: linear-gradient(
+    130deg,
+    color-mix(in srgb, var(--dg-accent) 75%, transparent),
+    color-mix(in srgb, var(--dg-brand-blue) 65%, transparent) 45%,
+    color-mix(in srgb, var(--dg-accent) 60%, transparent)
+  );
+}
+
+/* Scroll reveal. Starts hidden only when JS will observe it (see useReveal). */
+.reveal {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal[data-reveal='pending'] {
+    opacity: 0;
+    translate: 0 26px;
+  }
+
+  .reveal[data-reveal='shown'] {
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+      translate 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+.layer-3d {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Tilt driven by pointer position via --rx / --ry custom properties. */
+.tilt-3d {
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  /* Declared here rather than with utilities: this rule is unlayered and would
+     otherwise override a `transition-*` class on the same element. */
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    translate 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease;
+}
+
+/* Pushes a child toward the viewer inside a tilted parent. */
+.depth-1 {
+  transform: translateZ(28px);
+}
+
+.depth-2 {
+  transform: translateZ(56px);
+}
+
+.depth-3 {
+  transform: translateZ(92px);
+}
+
+.depth-4 {
+  transform: translateZ(130px);
+}
+
+/*
+ * Perspective grid used as a horizon behind the hero and the closing CTA.
+ * Colours come from the theme tokens so it follows light/dark automatically.
+ */
+.grid-floor {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-primary) 14%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-primary) 14%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 48px 48px;
+  transform: rotateX(72deg);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 45%, transparent 92%);
+  mask-image: linear-gradient(to bottom, transparent, #000 45%, transparent 92%);
+}
+
+.grid-floor-inverse {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.12) 1px, transparent 1px);
+  background-size: 48px 48px;
+  transform: rotateX(72deg);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 45%, transparent 92%);
+  mask-image: linear-gradient(to bottom, transparent, #000 45%, transparent 92%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .float-slow {
+    animation: float-y 7s ease-in-out infinite;
+  }
+
+  .float-slower {
+    animation: float-y 10s ease-in-out infinite;
+  }
+
+  .spin-slow {
+    animation: spin-3d 24s linear infinite;
+  }
+
+  .rise-in {
+    animation: rise-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -14px;
+  }
+}
+
+@keyframes spin-3d {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
 }
 
 /*

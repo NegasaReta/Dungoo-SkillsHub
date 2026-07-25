@@ -46,7 +46,10 @@ export default function RecentActivitiesCard({ activities }) {
           </thead>
           <tbody>
             {activities.map((activity) => (
-              <tr key={activity.id} className="border-b border-primary/5 last:border-0">
+              <tr
+                key={activity.id}
+                className="border-b border-primary/5 transition-colors last:border-0 hover:bg-surface/60"
+              >
                 <td className="py-4 pr-4 text-sm font-medium text-primary">{activity.name}</td>
                 <td className="py-4 pr-4 text-sm text-primary/60">{activity.category}</td>
                 <td className="py-4 pr-4 text-sm text-primary/60">{activity.duration}</td>

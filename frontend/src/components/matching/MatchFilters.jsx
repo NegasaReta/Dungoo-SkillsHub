@@ -119,7 +119,7 @@ export default function MatchFilters({ filters, onChange }) {
             }`}
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-panel shadow transition-transform ${
                 filters.onlineOnly ? 'left-5' : 'left-0.5'
               }`}
             />
@@ -129,7 +129,7 @@ export default function MatchFilters({ filters, onChange }) {
 
       <Panel className="bg-brand-blue/5">
         <div className="flex items-start gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-blue/15 text-brand-blue">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-blue/15 text-link">
             <NavIcon name="spark" className="h-4 w-4" />
           </span>
           <div>

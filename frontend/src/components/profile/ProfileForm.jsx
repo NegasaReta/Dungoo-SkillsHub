@@ -219,7 +219,7 @@ export default function ProfileForm({
         <button
           type="submit"
           disabled={submitting || (showReset && !dirty)}
-          className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-blue/90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-lg bg-brand-blue px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-blue/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? 'Saving…' : submitLabel}
         </button>

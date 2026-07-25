@@ -7,13 +7,13 @@ export default function PasswordChecklist({ value }) {
         <li
           key={rule.id}
           className={`flex items-center gap-1.5 text-xs ${
-            rule.passed ? 'text-green-700' : 'text-primary/50'
+            rule.passed ? 'text-success' : 'text-primary/50'
           }`}
         >
           <span
             aria-hidden="true"
             className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-[9px] leading-none ${
-              rule.passed ? 'bg-green-600 text-white' : 'border border-primary/25'
+              rule.passed ? 'bg-success text-white' : 'border border-primary/25'
             }`}
           >
             {rule.passed ? '✓' : ''}
