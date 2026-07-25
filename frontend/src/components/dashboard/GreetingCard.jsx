@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import NavIcon from '../app/NavIcon.jsx'
 import Panel from './Panel.jsx'
 
@@ -16,24 +18,34 @@ export default function GreetingCard({ greeting, name, sessionsRemaining, focusA
         </h1>
 
         <p className="mt-3 max-w-lg text-sm leading-relaxed text-primary/70">
-          You&apos;re <span className="font-semibold text-primary">{sessionsRemaining} sessions</span>{' '}
-          away from your weekly goal. Your focus on {focusArea} is paying off.
+          {sessionsRemaining === 0 ? (
+            <>You&apos;ve hit your weekly practice goal.</>
+          ) : (
+            <>
+              You&apos;re{' '}
+              <span className="font-semibold text-primary">
+                {sessionsRemaining} session{sessionsRemaining === 1 ? '' : 's'}
+              </span>{' '}
+              away from your weekly goal.
+            </>
+          )}{' '}
+          Next win: sharpen {focusArea}.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
+          <Link
+            to="/interview"
             className="inline-flex items-center gap-2 rounded-lg bg-brand-blue px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-blue/90"
           >
             <NavIcon name="play" className="h-4 w-4" />
-            Continue Learning
-          </button>
-          <button
-            type="button"
+            Start practising
+          </Link>
+          <Link
+            to="/passport"
             className="rounded-lg border border-primary/15 bg-white px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-surface"
           >
-            View Plan
-          </button>
+            View Skill Passport
+          </Link>
         </div>
       </div>
     </Panel>

@@ -4,8 +4,8 @@ import Panel from './Panel.jsx'
 const RADIUS = 26
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
-export default function DailyGoalCard({ completedMinutes, targetMinutes }) {
-  const ratio = targetMinutes ? Math.min(completedMinutes / targetMinutes, 1) : 0
+export default function DailyGoalCard({ label, completed, target, unit }) {
+  const ratio = target ? Math.min(completed / target, 1) : 0
   const percent = Math.round(ratio * 100)
 
   return (
@@ -31,11 +31,11 @@ export default function DailyGoalCard({ completedMinutes, targetMinutes }) {
       </div>
 
       <div>
-        <p className="text-xs text-primary/60">Daily Goal</p>
+        <p className="text-xs text-primary/60">{label}</p>
         <p className="mt-1 text-lg font-semibold text-primary">
-          {completedMinutes} / {targetMinutes}
+          {completed} / {target}
         </p>
-        <p className="text-xs text-primary/60">Min</p>
+        <p className="text-xs text-primary/60">{unit}</p>
       </div>
     </Panel>
   )

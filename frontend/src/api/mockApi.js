@@ -38,10 +38,15 @@ function publicUser(user) {
 
 const tokenFor = (user) => `${TOKEN_PREFIX}${user.id}`
 
-function currentUserIndex(users) {
+/** Id of the signed-in mock user, or null. Shared with the mock interview store. */
+export function currentUserId() {
   const token = getToken()
-  if (!token?.startsWith(TOKEN_PREFIX)) return -1
-  return users.findIndex((user) => user.id === token.slice(TOKEN_PREFIX.length))
+  return token?.startsWith(TOKEN_PREFIX) ? token.slice(TOKEN_PREFIX.length) : null
+}
+
+function currentUserIndex(users) {
+  const id = currentUserId()
+  return id ? users.findIndex((user) => user.id === id) : -1
 }
 
 function session(user) {

@@ -1,9 +1,11 @@
+import { Link } from 'react-router-dom'
+
 import NavIcon from '../app/NavIcon.jsx'
 import Panel from './Panel.jsx'
 
 const AVATAR_TONES = ['bg-brand-blue', 'bg-accent text-primary']
 
-export default function SuggestionCard({ title, description, participants }) {
+export default function SuggestionCard({ title, description, participants = [] }) {
   return (
     <Panel className="h-full">
       <div className="flex items-start justify-between gap-3">
@@ -37,13 +39,13 @@ export default function SuggestionCard({ title, description, participants }) {
           ))}
         </div>
 
-        <button
-          type="button"
+        <Link
+          to="/interview"
           className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-blue transition-colors hover:text-primary"
         >
           Start Session
           <NavIcon name="arrow" className="h-4 w-4" />
-        </button>
+        </Link>
       </div>
     </Panel>
   )

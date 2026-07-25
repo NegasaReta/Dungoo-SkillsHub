@@ -4,6 +4,10 @@
  */
 export const strings = {
   interview: {
+    pageEyebrow: 'AI mock interview',
+    pageTitle: 'Video Mock Interview',
+    pageSubtitle:
+      'Answer role-specific questions on camera and get scored on clarity, confidence, and STAR structure. Every score feeds your Skill Passport.',
     setupTitle: 'Practice interview',
     setupBody: 'Pick the role you are preparing for. Questions are matched to it.',
     setupStart: 'Continue',

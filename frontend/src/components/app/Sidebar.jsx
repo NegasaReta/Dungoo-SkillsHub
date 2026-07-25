@@ -4,8 +4,10 @@ import NavIcon from './NavIcon.jsx'
 
 const NAV_ITEMS = [
   { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
+  { to: '/interview', icon: 'mic', label: 'Mock Interview' },
   { to: '/coach', icon: 'coach', label: 'AI Coach' },
   { to: '/matching', icon: 'matching', label: 'Matching' },
+  { to: '/passport', icon: 'passport', label: 'Skill Passport' },
   { to: '/analytics', icon: 'analytics', label: 'Analytics' },
   { to: '/resources', icon: 'resources', label: 'Resources' },
   { to: '/settings', icon: 'settings', label: 'Settings' },

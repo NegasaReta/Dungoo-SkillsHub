@@ -14,6 +14,7 @@ const ComingSoon = lazy(() => import('./pages/ComingSoon.jsx'))
 const CompleteProfile = lazy(() => import('./pages/CompleteProfile.jsx'))
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
 const InterviewSession = lazy(() => import('./pages/InterviewSession.jsx'))
+const Matching = lazy(() => import('./pages/Matching.jsx'))
 const Onboarding = lazy(() => import('./pages/Onboarding.jsx'))
 const Settings = lazy(() => import('./pages/Settings.jsx'))
 const SkillPassport = lazy(() => import('./pages/SkillPassport.jsx'))
@@ -61,7 +62,6 @@ function GuestOnly({ children }) {
 
 const PLACEHOLDER_ROUTES = [
   { path: '/coach', title: 'AI Coach' },
-  { path: '/matching', title: 'Matching' },
   { path: '/analytics', title: 'Analytics' },
   { path: '/resources', title: 'Resources' },
 ]
@@ -104,6 +104,15 @@ function AppRoutes() {
         element={
           <Protected>
             <Dashboard />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/matching"
+        element={
+          <Protected>
+            <Matching />
           </Protected>
         }
       />

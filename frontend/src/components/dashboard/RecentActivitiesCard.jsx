@@ -1,3 +1,4 @@
+import { SCORE_MAX } from '../../constants.js'
 import Panel from './Panel.jsx'
 
 const STATUS_STYLES = {
@@ -13,6 +14,17 @@ const STATUS_LABELS = {
 const COLUMNS = ['Activity Name', 'Category', 'Duration', 'Score', 'Date', 'Status']
 
 export default function RecentActivitiesCard({ activities }) {
+  if (!activities.length) {
+    return (
+      <Panel>
+        <h2 className="text-base font-semibold text-primary">Recent Activities</h2>
+        <p className="mt-3 text-sm text-primary/60">
+          Nothing here yet. Your scored interview sessions will be listed as you complete them.
+        </p>
+      </Panel>
+    )
+  }
+
   return (
     <Panel>
       <h2 className="text-base font-semibold text-primary">Recent Activities</h2>
@@ -42,7 +54,9 @@ export default function RecentActivitiesCard({ activities }) {
                   {activity.score === null ? (
                     <span className="text-primary/40">N/A</span>
                   ) : (
-                    <span className="font-semibold text-success">{activity.score}/100</span>
+                    <span className="font-semibold text-success">
+                      {activity.score.toFixed(1)}/{SCORE_MAX}
+                    </span>
                   )}
                 </td>
                 <td className="py-4 pr-4 text-sm text-primary/60">{activity.date}</td>
