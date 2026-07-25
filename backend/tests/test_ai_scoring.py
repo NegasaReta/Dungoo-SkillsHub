@@ -13,6 +13,12 @@ def test_prompt_includes_role_question_and_transcript():
     assert "I cleaned it up." in prompt
 
 
+def test_prompt_states_the_one_to_five_scale():
+    prompt = build_prompt("software-engineer", "Q", "A")
+
+    assert 'from 1 to 5' in prompt
+
+
 def test_prompt_keeps_json_shape_instruction_intact():
     prompt = build_prompt("software-engineer", "Q", "A")
 
@@ -23,9 +29,9 @@ def test_prompt_keeps_json_shape_instruction_intact():
 def test_parse_scores_reads_every_dimension():
     raw = json.dumps(
         {
-            "clarity": 7,
-            "confidence": 6.5,
-            "star": 8,
+            "clarity": 4,
+            "confidence": 3.5,
+            "star": 5,
             "summary": "Solid structure.",
             "strengths": ["clear result"],
             "improvements": ["name the metric"],
@@ -34,22 +40,22 @@ def test_parse_scores_reads_every_dimension():
 
     result = parse_scores(raw)
 
-    assert result["clarity"] == 7
-    assert result["confidence"] == 6.5
-    assert result["star"] == 8
+    assert result["clarity"] == 4
+    assert result["confidence"] == 3.5
+    assert result["star"] == 5
     assert result["strengths"] == ["clear result"]
 
 
 def test_parse_scores_clamps_out_of_range_values():
-    raw = json.dumps({"clarity": 42, "confidence": -3, "star": 5})
+    raw = json.dumps({"clarity": 42, "confidence": -3, "star": 3})
 
     result = parse_scores(raw)
 
-    assert result["clarity"] == 10
-    assert result["confidence"] == 0
+    assert result["clarity"] == 5
+    assert result["confidence"] == 1
 
 
-def test_parse_scores_defaults_missing_fields():
+def test_parse_scores_marks_missing_axis_unscored_rather_than_clamping():
     result = parse_scores(json.dumps({"clarity": 5}))
 
     assert result["star"] == 0
