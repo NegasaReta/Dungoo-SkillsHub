@@ -11,3 +11,13 @@
   --color-success: #0f8a5f;
   --color-track: #e2e8f2;
 }
+
+/*
+ * The resource reader renders into a portal outside #root, so printing while it is
+ * open produces the guide on its own instead of the whole app behind it.
+ */
+@media print {
+  body.resource-reader-open #root {
+    display: none;
+  }
+}

@@ -17,6 +17,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
 const InterviewSession = lazy(() => import('./pages/InterviewSession.jsx'))
 const Matching = lazy(() => import('./pages/Matching.jsx'))
 const Onboarding = lazy(() => import('./pages/Onboarding.jsx'))
+const Resources = lazy(() => import('./pages/Resources.jsx'))
 const Settings = lazy(() => import('./pages/Settings.jsx'))
 const SkillPassport = lazy(() => import('./pages/SkillPassport.jsx'))
 
@@ -61,10 +62,7 @@ function GuestOnly({ children }) {
   return children
 }
 
-const PLACEHOLDER_ROUTES = [
-  { path: '/coach', title: 'AI Coach' },
-  { path: '/resources', title: 'Resources' },
-]
+const PLACEHOLDER_ROUTES = [{ path: '/coach', title: 'AI Coach' }]
 
 function AppRoutes() {
   return (
@@ -122,6 +120,15 @@ function AppRoutes() {
         element={
           <Protected>
             <Analytics />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/resources"
+        element={
+          <Protected>
+            <Resources />
           </Protected>
         }
       />
