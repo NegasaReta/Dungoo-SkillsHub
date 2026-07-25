@@ -180,6 +180,46 @@ export function passportScores(summary) {
   }
 }
 
+/**
+ * One entry per calendar day across the trailing window, oldest first. Days with
+ * no practice are kept with `average: null` so a gap reads as a gap in a chart
+ * instead of being smoothed into a flat line.
+ */
+export function dailyActivity(sessions = [], days = 30, now = new Date()) {
+  const buckets = new Map()
+
+  for (let offset = days - 1; offset >= 0; offset -= 1) {
+    const date = shiftDays(now, -offset)
+    buckets.set(dayKey(date), { date, answers: 0, scoreTotal: 0 })
+  }
+
+  for (const response of sessions.flatMap((session) => session.responses ?? [])) {
+    const bucket = buckets.get(dayKey(response.created_at ?? now))
+    if (!bucket) continue
+
+    bucket.answers += 1
+    bucket.scoreTotal += mean(AXES.map(({ key }) => response[key]))
+  }
+
+  return [...buckets.values()].map(({ date, answers, scoreTotal }) => ({
+    date,
+    answers,
+    average: answers ? Math.round((scoreTotal / answers) * 10) / 10 : null,
+  }))
+}
+
+/** Chunks daily activity into columns of seven days for the practice heatmap. */
+export function activityWeeks(activity) {
+  const weeks = []
+  for (let index = 0; index < activity.length; index += 7) {
+    weeks.push(activity.slice(index, index + 7))
+  }
+  return weeks
+}
+
+/** Heatmap shading step, 0 (no practice) to 4 (a heavy day). */
+export const activityLevel = (answers) => Math.min(4, answers)
+
 export function averageScore(scores = {}) {
   return mean(Object.values(scores))
 }

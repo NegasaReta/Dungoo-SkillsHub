@@ -10,6 +10,7 @@ import Signup from './pages/Signup.jsx'
 
 // The signed-in app pulls in charting and the dashboard shell, so it is split
 // out of the bundle that visitors download for the landing and auth pages.
+const Analytics = lazy(() => import('./pages/Analytics.jsx'))
 const ComingSoon = lazy(() => import('./pages/ComingSoon.jsx'))
 const CompleteProfile = lazy(() => import('./pages/CompleteProfile.jsx'))
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
@@ -62,7 +63,6 @@ function GuestOnly({ children }) {
 
 const PLACEHOLDER_ROUTES = [
   { path: '/coach', title: 'AI Coach' },
-  { path: '/analytics', title: 'Analytics' },
   { path: '/resources', title: 'Resources' },
 ]
 
@@ -113,6 +113,15 @@ function AppRoutes() {
         element={
           <Protected>
             <Matching />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/analytics"
+        element={
+          <Protected>
+            <Analytics />
           </Protected>
         }
       />
