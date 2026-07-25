@@ -1,53 +1,203 @@
 {
-  "software-engineer": [
-    {
-      "id": "swe-1",
-      "text": "Tell me about a bug you found that others had missed. How did you track it down?",
-      "competency": "problem-solving"
+  "software-engineer": {
+    "label": "Software Engineer",
+    "opening": {
+      "id": "swe-open",
+      "text": "To start, tell me briefly about the work you have been doing and what kind of engineering role you are aiming for.",
+      "competency": "background",
+      "lead_in": "Good to meet you, and thanks for making the time."
     },
-    {
-      "id": "swe-2",
-      "text": "Describe a time you disagreed with a technical decision on your team.",
-      "competency": "collaboration"
+    "questions": [
+      {
+        "id": "swe-1",
+        "text": "Tell me about a bug you found that others had missed. How did you track it down?",
+        "competency": "problem-solving",
+        "lead_in": "Most of this job is reading code you did not write."
+      },
+      {
+        "id": "swe-2",
+        "text": "Describe a time you disagreed with a technical decision on your team. What did you do?",
+        "competency": "collaboration",
+        "lead_in": "Engineering teams disagree constantly, and how that goes matters."
+      },
+      {
+        "id": "swe-3",
+        "text": "Walk me through a project you shipped end to end, and what you would change if you built it again.",
+        "competency": "ownership",
+        "lead_in": "I would like to hear about something you carried all the way through."
+      },
+      {
+        "id": "swe-4",
+        "text": "Tell me about a technology you had to learn quickly. How did you go about it?",
+        "competency": "learning",
+        "lead_in": "The tools here change faster than anyone can keep up with."
+      },
+      {
+        "id": "swe-5",
+        "text": "Describe a time you had to explain something technical to someone non-technical.",
+        "competency": "communication",
+        "lead_in": "Engineers spend more time explaining their work than writing it."
+      }
+    ],
+    "probes": [
+      {
+        "id": "swe-p1",
+        "text": "What was the measurable result of that work?",
+        "competency": "problem-solving",
+        "lead_in": "Let me stay on that for a moment."
+      },
+      {
+        "id": "swe-p2",
+        "text": "What was your specific contribution, as opposed to the team's?",
+        "competency": "ownership",
+        "lead_in": "One thing I want to be clear on."
+      },
+      {
+        "id": "swe-p3",
+        "text": "Can you walk me through the concrete steps you took, in order?",
+        "competency": "communication",
+        "lead_in": "I want to follow the sequence here."
+      },
+      {
+        "id": "swe-p4",
+        "text": "What would you do differently if you faced that situation again?",
+        "competency": "learning",
+        "lead_in": "Looking back on it now."
+      }
+    ]
+  },
+  "data-analyst": {
+    "label": "Data Analyst",
+    "opening": {
+      "id": "da-open",
+      "text": "To start, tell me briefly about the kind of analysis work you have done and the role you are aiming for.",
+      "competency": "background",
+      "lead_in": "Good to meet you, and thanks for making the time."
     },
-    {
-      "id": "swe-3",
-      "text": "Walk me through a project you shipped end to end and what you would change.",
-      "competency": "ownership"
-    }
-  ],
-  "data-analyst": [
-    {
-      "id": "da-1",
-      "text": "Describe an analysis where the data contradicted what stakeholders expected.",
-      "competency": "communication"
+    "questions": [
+      {
+        "id": "da-1",
+        "text": "Describe an analysis where the data contradicted what stakeholders expected. How did you handle it?",
+        "competency": "communication",
+        "lead_in": "Analysts often end up delivering news nobody ordered."
+      },
+      {
+        "id": "da-2",
+        "text": "Tell me about a time you had to work with messy or incomplete data.",
+        "competency": "rigour",
+        "lead_in": "Real data is never as tidy as a tutorial dataset."
+      },
+      {
+        "id": "da-3",
+        "text": "How have you turned an analysis into a decision someone actually made?",
+        "competency": "impact",
+        "lead_in": "An analysis nobody acts on is just a document."
+      },
+      {
+        "id": "da-4",
+        "text": "Describe a time you found an error in your own analysis. What did you do next?",
+        "competency": "ownership",
+        "lead_in": "Everyone gets something wrong eventually."
+      },
+      {
+        "id": "da-5",
+        "text": "Tell me about working with someone who needed a different level of detail than you would normally give.",
+        "competency": "collaboration",
+        "lead_in": "Not everyone wants the same depth of detail."
+      }
+    ],
+    "probes": [
+      {
+        "id": "da-p1",
+        "text": "What number actually changed as a result?",
+        "competency": "impact",
+        "lead_in": "Let me stay on the impact for a moment."
+      },
+      {
+        "id": "da-p2",
+        "text": "How did you check that your conclusion was correct?",
+        "competency": "rigour",
+        "lead_in": "I want to understand your process here."
+      },
+      {
+        "id": "da-p3",
+        "text": "Who was the audience, and how did you adjust for them?",
+        "competency": "communication",
+        "lead_in": "Say a bit more about who you were talking to."
+      },
+      {
+        "id": "da-p4",
+        "text": "What did you personally decide, rather than being told to do?",
+        "competency": "ownership",
+        "lead_in": "One thing I want to separate out."
+      }
+    ]
+  },
+  "customer-support": {
+    "label": "Customer Support",
+    "opening": {
+      "id": "cs-open",
+      "text": "To start, tell me briefly about your experience supporting customers and the role you are aiming for.",
+      "competency": "background",
+      "lead_in": "Good to meet you, and thanks for making the time."
     },
-    {
-      "id": "da-2",
-      "text": "Tell me about a time you had to work with messy or incomplete data.",
-      "competency": "rigour"
-    },
-    {
-      "id": "da-3",
-      "text": "How have you turned an analysis into a decision someone actually made?",
-      "competency": "impact"
-    }
-  ],
-  "customer-support": [
-    {
-      "id": "cs-1",
-      "text": "Tell me about the most difficult customer you have handled.",
-      "competency": "empathy"
-    },
-    {
-      "id": "cs-2",
-      "text": "Describe a time you had to say no to a customer request.",
-      "competency": "communication"
-    },
-    {
-      "id": "cs-3",
-      "text": "How do you keep quality up when your queue is overloaded?",
-      "competency": "prioritisation"
-    }
-  ]
+    "questions": [
+      {
+        "id": "cs-1",
+        "text": "Tell me about the most difficult customer you have handled.",
+        "competency": "empathy",
+        "lead_in": "Support work is mostly calm until it suddenly is not."
+      },
+      {
+        "id": "cs-2",
+        "text": "Describe a time you had to say no to a customer request.",
+        "competency": "communication",
+        "lead_in": "Turning people down is half of this job."
+      },
+      {
+        "id": "cs-3",
+        "text": "How do you keep quality up when your queue is overloaded?",
+        "competency": "prioritisation",
+        "lead_in": "Queues get away from everybody at some point."
+      },
+      {
+        "id": "cs-4",
+        "text": "Tell me about a time you made a mistake that affected a customer.",
+        "competency": "ownership",
+        "lead_in": "In this job mistakes reach real people."
+      },
+      {
+        "id": "cs-5",
+        "text": "Describe a day when the pressure got to you. How did you handle it?",
+        "competency": "resilience",
+        "lead_in": "Some days on a support desk are heavier than others."
+      }
+    ],
+    "probes": [
+      {
+        "id": "cs-p1",
+        "text": "How did the customer respond to what you did?",
+        "competency": "empathy",
+        "lead_in": "I am curious how that landed."
+      },
+      {
+        "id": "cs-p2",
+        "text": "What exactly did you say to them?",
+        "competency": "communication",
+        "lead_in": "Wording matters a lot here."
+      },
+      {
+        "id": "cs-p3",
+        "text": "How did you decide what to handle first?",
+        "competency": "prioritisation",
+        "lead_in": "Let me stay on the triage."
+      },
+      {
+        "id": "cs-p4",
+        "text": "What did you put in place so it would not happen again?",
+        "competency": "ownership",
+        "lead_in": "Thinking about afterwards."
+      }
+    ]
+  }
 }

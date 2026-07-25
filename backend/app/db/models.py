@@ -42,11 +42,38 @@ class InterviewSession(Base):
     status: Mapped[str] = mapped_column(String(20), default="in_progress")
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Aggregated on the candidate's device and posted once when the call ends. Raw
+    # frames never reach the server, so this is the only visual record there is.
+    engagement: Mapped[dict] = mapped_column(JSON, default=dict)
+    # question id -> the sentence said before that question, settled when the
+    # session starts so no turn waits on the model mid-conversation.
+    lead_ins: Mapped[dict] = mapped_column(JSON, default=dict)
 
     user: Mapped[User] = relationship(back_populates="interview_sessions")
     reports: Mapped[list["FeedbackReport"]] = relationship(
         back_populates="session", cascade="all, delete-orphan"
     )
+    turns: Mapped[list["InterviewTurn"]] = relationship(
+        back_populates="session",
+        cascade="all, delete-orphan",
+        order_by="InterviewTurn.turn_index",
+    )
+
+
+class InterviewTurn(Base):
+    """One question-and-answer exchange, stored so the next question can build on it."""
+
+    __tablename__ = "interview_turns"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    session_id: Mapped[int] = mapped_column(ForeignKey("interview_sessions.id"), index=True)
+    turn_index: Mapped[int] = mapped_column(Integer)
+    question_id: Mapped[str] = mapped_column(String(64))
+    question_text: Mapped[str] = mapped_column(Text)
+    transcript: Mapped[str] = mapped_column(Text, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    session: Mapped[InterviewSession] = relationship(back_populates="turns")
 
 
 class FeedbackReport(Base):
