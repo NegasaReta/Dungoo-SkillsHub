@@ -35,8 +35,11 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <div className="hidden md:block">
-          <Button as={Link} to="/onboarding" variant="accent">
+        <div className="hidden items-center gap-4 md:flex">
+          <Link to="/login" className="text-sm text-primary/70 hover:text-brand-blue">
+            Log in
+          </Link>
+          <Button as={Link} to="/signup" variant="accent">
             Start practicing
           </Button>
         </div>
@@ -67,8 +70,13 @@ export default function Navbar() {
               </a>
             </li>
           ))}
+          <li>
+            <Link to="/login" onClick={() => setOpen(false)} className="block py-2 text-primary/70">
+              Log in
+            </Link>
+          </li>
           <li className="pt-2">
-            <Button as={Link} to="/onboarding" variant="accent" className="w-full">
+            <Button as={Link} to="/signup" variant="accent" className="w-full">
               Start practicing
             </Button>
           </li>

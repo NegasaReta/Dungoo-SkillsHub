@@ -8,3 +8,18 @@ export const brandColors = {
   brandBlue: '#1B4A8F',
   surface: '#F4F7FB',
 }
+
+/**
+ * Surface palette for the signed-in app, derived from the same brand colours as
+ * the marketing site so the two halves of the product look like one product.
+ */
+export const appColors = {
+  base: brandColors.surface,
+  panel: '#FFFFFF',
+  panelMuted: brandColors.surface,
+  border: '#E2E8F2',
+  text: brandColors.primary,
+  muted: '#64748B',
+  blue: brandColors.brandBlue,
+  teal: '#0F8A5F',
+}

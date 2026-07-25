@@ -15,7 +15,7 @@ export default function CallToAction() {
             with the first entry in your Skill Passport.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Button as={Link} to="/onboarding" variant="accent" className="px-6 py-3">
+            <Button as={Link} to="/signup" variant="accent" className="px-6 py-3">
               Start practicing free
             </Button>
             <Button
