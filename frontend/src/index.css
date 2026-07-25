@@ -391,4 +391,14 @@ html.dark {
   body.resource-reader-open #root {
     display: none;
   }
+
+  /* Print on the light palette whatever the screen theme is: a dark panel wastes
+     ink, and light body text on white paper is unreadable. */
+  body.resource-reader-open {
+    --dg-primary: #0f172a;
+    --dg-panel: #ffffff;
+    --dg-canvas: #ffffff;
+    --dg-surface: #f4f7fb;
+    --dg-track: #e2e8f2;
+  }
 }

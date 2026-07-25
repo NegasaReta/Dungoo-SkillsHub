@@ -41,7 +41,7 @@ export default function ResourceReader({ resource, onClose }) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex justify-center overflow-y-auto bg-primary/50 p-4 backdrop-blur-sm print:static print:block print:overflow-visible print:bg-white print:p-0"
+      className="fixed inset-0 z-50 flex justify-center overflow-y-auto bg-navy/70 p-4 backdrop-blur-sm print:static print:block print:overflow-visible print:bg-white print:p-0"
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose()
       }}
@@ -50,7 +50,7 @@ export default function ResourceReader({ resource, onClose }) {
         role="dialog"
         aria-modal="true"
         aria-label={resource.title}
-        className="my-6 h-fit w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl sm:p-8 print:my-0 print:max-w-none print:shadow-none"
+        className="my-6 h-fit w-full max-w-3xl rounded-2xl bg-panel p-6 shadow-xl sm:p-8 print:my-0 print:max-w-none print:shadow-none"
       >
         <header className="flex items-start justify-between gap-4 border-b border-primary/10 pb-5">
           <div>

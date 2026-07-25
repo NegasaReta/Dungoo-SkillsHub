@@ -70,7 +70,7 @@ export default function Resources() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={copy.searchPlaceholder}
-              className="w-full rounded-lg border border-primary/15 bg-white py-2.5 pl-9 pr-3 text-sm text-primary placeholder:text-primary/40 focus:border-brand-blue focus:outline-none"
+              className="w-full rounded-lg border border-primary/15 bg-surface py-2.5 pl-9 pr-3 text-sm text-primary outline-none transition-colors placeholder:text-primary/40 focus:border-brand-blue focus:bg-panel"
             />
           </label>
         </div>

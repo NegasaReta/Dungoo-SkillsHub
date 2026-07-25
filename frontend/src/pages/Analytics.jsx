@@ -81,7 +81,7 @@ export default function Analytics() {
                 <div
                   role="group"
                   aria-label="Date range"
-                  className="flex items-center gap-1 rounded-lg border border-primary/15 bg-white p-1"
+                  className="flex items-center gap-1 rounded-lg border border-primary/15 bg-panel p-1"
                 >
                   {RANGES.map((days) => (
                     <button
@@ -103,7 +103,7 @@ export default function Analytics() {
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-2 rounded-lg border border-primary/15 bg-white px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-surface"
+                  className="inline-flex items-center gap-2 rounded-lg border border-primary/15 bg-panel px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-surface"
                 >
                   <NavIcon name="download" className="h-4 w-4" />
                   Export PDF
@@ -306,7 +306,7 @@ function AnalyticsEmpty() {
       <div className="mt-8 grid gap-3 text-left sm:grid-cols-2">
         {PREVIEW.map((item) => (
           <div key={item.title} className="rounded-xl border border-primary/10 bg-surface p-4">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-brand-blue shadow-sm">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-panel text-brand-blue shadow-sm">
               <NavIcon name={item.icon} className="h-4 w-4" />
             </span>
             <h3 className="mt-3 text-sm font-semibold text-primary">{item.title}</h3>
@@ -325,7 +325,7 @@ function AnalyticsEmpty() {
         </Link>
         <Link
           to="/matching"
-          className="inline-flex items-center gap-2 rounded-lg border border-primary/15 bg-white px-5 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-surface"
+          className="inline-flex items-center gap-2 rounded-lg border border-primary/15 bg-panel px-5 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-surface"
         >
           <NavIcon name="matching" className="h-4 w-4" />
           Find a language partner

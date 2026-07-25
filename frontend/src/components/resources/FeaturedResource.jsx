@@ -6,7 +6,9 @@ export default function FeaturedResource({ resource, onOpen }) {
   if (!resource) return null
 
   return (
-    <section className="flex h-full flex-col justify-between overflow-hidden rounded-2xl bg-primary p-6 text-white shadow-sm">
+    // Navy rather than primary: primary inverts in dark mode, which would put white
+    // text on a near-white card.
+    <section className="flex h-full flex-col justify-between overflow-hidden rounded-2xl bg-navy p-6 text-white shadow-sm">
       <div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary">

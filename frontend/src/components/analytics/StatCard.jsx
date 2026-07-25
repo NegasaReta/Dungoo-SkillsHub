@@ -22,10 +22,8 @@ export default function StatCard({ icon, label, value, suffix, changePercent, hi
 
       {showChange && (
         <span
-          // Gold rather than red for a dip: the palette has no danger colour, and a
-          // quiet week is not an error.
           className={`shrink-0 self-start text-[11px] font-semibold ${
-            changePercent === 0 ? 'text-primary/40' : positive ? 'text-success' : 'text-accent'
+            changePercent === 0 ? 'text-primary/40' : positive ? 'text-success' : 'text-danger'
           }`}
         >
           {changePercent === 0 ? '–' : positive ? '↗' : '↘'} {Math.abs(changePercent)}%

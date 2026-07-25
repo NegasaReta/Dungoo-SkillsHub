@@ -21,7 +21,7 @@ export default function TopicTabs({ topic, onChange, counts }) {
             className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${
               active
                 ? 'bg-brand-blue text-white'
-                : 'border border-primary/15 bg-white text-primary/70 hover:text-primary'
+                : 'border border-primary/15 bg-panel text-primary/70 hover:text-primary'
             }`}
           >
             {label}
