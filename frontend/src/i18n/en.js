@@ -277,7 +277,7 @@ export const strings = {
 
   account: {
     menuLabel: 'Account',
-    viewProfile: 'Profile and settings',
+    manageAccount: 'Manage account',
     appearance: 'Appearance',
     signOut: 'Sign out',
     signedInAs: 'Signed in as',

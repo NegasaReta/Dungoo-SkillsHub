@@ -25,7 +25,12 @@ export const NAV_ITEMS = [
     tone: 'accent',
   },
   { to: '/coach', icon: 'coach', label: 'AI Trainer', keywords: 'coach trainer feedback practice communication' },
-  { to: '/matching', icon: 'matching', label: 'Matching', keywords: 'peer language exchange partner' },
+  {
+    to: '/matching',
+    icon: 'matching',
+    label: 'Peer Learning',
+    keywords: 'matching peer language exchange partner',
+  },
   { to: '/analytics', icon: 'analytics', label: 'Analytics', keywords: 'charts scores trends' },
   { to: '/resources', icon: 'resources', label: 'Resources', keywords: 'guides library reading' },
   { to: '/settings', icon: 'settings', label: 'Settings', keywords: 'profile photo appearance theme account' },
