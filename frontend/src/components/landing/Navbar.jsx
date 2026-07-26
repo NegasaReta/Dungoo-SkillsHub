@@ -37,8 +37,9 @@ export default function Navbar() {
         <ul className="hidden items-center gap-7 md:flex">
           {t.links.map((link) => (
             <li key={link.href}>
+              {/* Rooted at "/" so the anchor still resolves from a footer page. */}
               <a
-                href={link.href}
+                href={`/${link.href}`}
                 className="group relative text-sm text-primary/70 transition-colors hover:text-link"
               >
                 {link.label}
@@ -92,7 +93,7 @@ export default function Navbar() {
           {t.links.map((link) => (
             <li key={link.href}>
               <a
-                href={link.href}
+                href={`/${link.href}`}
                 onClick={() => setOpen(false)}
                 className="block rounded-lg px-2 py-2 text-primary/70 transition-colors hover:bg-brand-blue/10 hover:text-link"
               >

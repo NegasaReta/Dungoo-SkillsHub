@@ -14,16 +14,20 @@ import Signup from './pages/Signup.jsx'
 
 // The signed-in app pulls in charting and the dashboard shell, so it is split
 // out of the bundle that visitors download for the landing and auth pages.
+const About = lazy(() => import('./pages/About.jsx'))
 const Analytics = lazy(() => import('./pages/Analytics.jsx'))
 const ComingSoon = lazy(() => import('./pages/ComingSoon.jsx'))
+const Contact = lazy(() => import('./pages/Contact.jsx'))
 const CompleteProfile = lazy(() => import('./pages/CompleteProfile.jsx'))
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
 const InterviewSession = lazy(() => import('./pages/InterviewSession.jsx'))
 const Matching = lazy(() => import('./pages/Matching.jsx'))
 const Onboarding = lazy(() => import('./pages/Onboarding.jsx'))
+const Privacy = lazy(() => import('./pages/Privacy.jsx'))
 const Resources = lazy(() => import('./pages/Resources.jsx'))
 const Settings = lazy(() => import('./pages/Settings.jsx'))
 const SkillPassport = lazy(() => import('./pages/SkillPassport.jsx'))
+const Terms = lazy(() => import('./pages/Terms.jsx'))
 
 function ScreenLoader() {
   return (
@@ -72,6 +76,12 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+
+      {/* Public, and reachable signed in or out: the footer links here from both. */}
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
 
       <Route
         path="/signup"
