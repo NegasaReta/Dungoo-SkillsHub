@@ -97,6 +97,17 @@ scores, engagement notes, and passport all come back populated.
 Worth running before a demo. A wrong or exhausted key is invisible until a candidate is
 mid-session, and both scripts cost a handful of API calls.
 
+### Checking peer matching
+
+```bash
+python scripts/matching_check.py    # needs a running server; calls no paid provider
+```
+
+`pytest` runs matching on SQLite, which returns naive datetimes where Postgres returns
+aware ones — and the whole daily allowance is datetime arithmetic. This script runs the
+same flow against Neon, and tries the two things a client would do to get more than its
+free 40 minutes: open two sessions at once, and report a duration of its own choosing.
+
 ## Environment variables
 
 | Variable | Purpose | Default |
@@ -108,6 +119,7 @@ mid-session, and both scripts cost a handful of API calls.
 | `SECRET_KEY` | JWT signing secret | `change-me` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT lifetime in minutes | `10080` (7 days) |
 | `CORS_ORIGINS` | Comma-separated origins, or `*` for local dev | `*` |
+| `EXCHANGE_DAILY_LIMIT_SECONDS` | Free peer-exchange time per day | `2400` (40 min) |
 
 ### Voice providers
 
@@ -187,6 +199,53 @@ so `0912345678`, `912345678`, `251912345678`, and `+251912345678` all persist as
 | `GET` | `/interview/sessions/{id}/feedback` | All feedback for a session |
 | `GET` | `/passport/me` | The signed-in user's Skill Passport |
 
+## Peer language exchange
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/matching/options` | Languages, levels, industries, and the daily limit |
+| `GET` | `/matching/peers?speaks=&wants=&industry=&level=&online_only=` | Ranked partners |
+| `GET` | `/matching/allowance` | Free time left today |
+| `GET` | `/matching/state` | Allowance plus any session still open |
+| `POST` | `/matching/sessions` | Start practising with a peer |
+| `POST` | `/matching/sessions/{id}/pause` | Stop the clock |
+| `POST` | `/matching/sessions/{id}/resume` | Start it again |
+| `POST` | `/matching/sessions/{id}/end` | Finish, and record the session |
+| `GET` | `/matching/sessions` | Completed practice, oldest first |
+
+### The clock belongs to the server
+
+The free tier allows 40 minutes of exchange a day (SRS 2.5), so the duration of a session
+decides what a user is still entitled to. That makes it the one number a client must not
+report about itself — the browser held it in `localStorage`, where clearing one key bought
+an unlimited day.
+
+So there is no field for a duration anywhere in this API. The client says *start*, *pause*,
+*resume*, and *end*; `exchange_sessions` stores the timestamps, and elapsed time is banked
+time plus the stretch currently running. Three consequences worth knowing:
+
+- Starting a session closes any the user left open. Two clocks would spend 40 minutes of
+  allowance in 20 minutes of wall time.
+- A closed tab keeps costing time, but usage is capped at the daily limit, so the worst
+  case is losing that day rather than going negative.
+- The day rolls over at midnight in Ethiopia, not UTC, so an evening session is not cut
+  short by a reset at 3am local. Ethiopia has never observed daylight saving, so a fixed
+  +03:00 is exact and needs no timezone database.
+
+### Partners are a directory, not accounts
+
+`app/data/peers.json` holds six placeholder partners. The pairing rule, though, is the real
+one and matches the frontend's `lib/matching.js` weight for weight: a match needs a peer who
+speaks what you want to practise **and** wants to practise what you speak. One-way overlaps
+are kept but ranked below mutual ones and labelled `mutual: false`, rather than being hidden.
+
+What a pair actually trade is recomputed server-side from that file when a session starts.
+The client sends a peer id and its own language filters, never the resulting match, so a
+doctored request cannot write a history entry for a session that could not have happened.
+
+`peer_directory.list_peers` is the single seam to replace when real users can be paired with
+each other. Levels and industries are slugs so the UI owns the wording and can translate it.
+
 ## Deployment
 
 `render.yaml` deploys the service on Render from the `backend/` directory.
@@ -203,7 +262,10 @@ shipping a `.env`, and lock `CORS_ORIGINS` down to the real frontend origin.
 - `app/services/passport_builder.py` — aggregates reports into the Skill Passport.
 - `app/services/transcription.py` — speech-to-text provider.
 - `app/services/lead_ins.py` — the sentence said before each question, and its guards.
+- `app/services/peer_directory.py` — the partner pool and the rule that ranks it.
+- `app/services/exchange.py` — the daily allowance and the session clock.
 - `app/data/questions.json` — the question bank, keyed by role slug.
+- `app/data/peers.json` — the peer exchange directory.
 
 ## How a question gets asked
 

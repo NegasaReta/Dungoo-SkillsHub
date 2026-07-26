@@ -34,6 +34,9 @@ class User(Base):
     reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
+    exchange_sessions: Mapped[list["ExchangeSession"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
 
     # The frontend edits names as two fields while one column is stored, so the
     # split happens on read. Splitting once keeps "Abebe Kebede Bekele" intact as
@@ -69,6 +72,44 @@ class PasswordResetToken(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     user: Mapped["User"] = relationship(back_populates="reset_tokens")
+
+
+class ExchangeSession(Base):
+    """A peer language-exchange session, timed by the server (FR-2).
+
+    The free tier allows 40 minutes a day, so the duration decides what a user is
+    still entitled to. That makes it the one number a client must not be trusted
+    to report: the clock is kept here instead, as timestamps the server writes.
+
+    `accumulated_seconds` is time already banked from earlier run stretches, and
+    `resumed_at` is when the current stretch began, or NULL while paused. Elapsed
+    time is the sum of the two, so pausing costs nothing and a client that
+    disappears mid-session cannot keep the clock running past the daily cap.
+    """
+
+    __tablename__ = "exchange_sessions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+
+    # Copied rather than referenced: peers live in a JSON directory today, and a
+    # finished session should still read correctly once that becomes a real table.
+    peer_id: Mapped[int] = mapped_column(Integer)
+    peer_name: Mapped[str] = mapped_column(String(120))
+    # Kept as two directions rather than one merged list, because "they taught me
+    # English" and "I taught them English" are different sessions, and a page
+    # restored after a reload has nothing else to reconstruct the split from.
+    teaches: Mapped[list[str]] = mapped_column(JSON, default=list)
+    learns: Mapped[list[str]] = mapped_column(JSON, default=list)
+    mutual: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    status: Mapped[str] = mapped_column(String(20), default="active", index=True)
+    accumulated_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    resumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    user: Mapped["User"] = relationship(back_populates="exchange_sessions")
 
 
 class InterviewSession(Base):
