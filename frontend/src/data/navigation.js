@@ -21,7 +21,12 @@ export const NAV_ITEMS = [
     label: 'Skill Passport',
     keywords: 'credential badge certificate scores milestones',
   },
-  { to: '/coach', icon: 'coach', label: 'AI Trainer', keywords: 'coach trainer feedback practice communication' },
+  {
+    to: '/practice',
+    icon: 'coach',
+    label: 'AI Trainer',
+    keywords: 'coach trainer feedback practice communication grammar speaking',
+  },
   { to: '/matching', icon: 'matching', label: 'Matching', keywords: 'peer language exchange partner' },
   { to: '/analytics', icon: 'analytics', label: 'Analytics', keywords: 'charts scores trends' },
   { to: '/resources', icon: 'resources', label: 'Resources', keywords: 'guides library reading' },

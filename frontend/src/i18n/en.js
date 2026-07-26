@@ -310,6 +310,13 @@ export const strings = {
     appearanceTitle: 'Appearance',
   },
 
+  practice: {
+    eyebrow: 'Communication practice',
+    title: 'AI Trainer',
+    subtitle:
+      'Hold a professional conversation and get your grammar, vocabulary, and tone corrected as you go.',
+  },
+
   interview: {
     lobbyTitle: 'Interview room',
     lobbySubtitle: 'Dungoo AI interviewer is waiting to join',

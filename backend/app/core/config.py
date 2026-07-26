@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     # A lite model on purpose: one interview spends around a dozen text calls, and the
     # free tier of gemini-2.5-flash allows twenty a day for the whole project.
     LLM_MODEL: str = "gemini-flash-lite-latest"
+    # Separate key from LLM_* above so the coach's quota cannot be spent by interviews.
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-3.1-flash-lite"
     SECRET_KEY: str = "change-me"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days

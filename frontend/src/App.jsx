@@ -1,6 +1,5 @@
 import { Suspense, lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-
 import DemoModeBadge from './components/common/DemoModeBadge.jsx'
 import Loader from './components/common/Loader.jsx'
 import { AvatarProvider } from './context/AvatarContext.jsx'
@@ -16,6 +15,7 @@ import Signup from './pages/Signup.jsx'
 // out of the bundle that visitors download for the landing and auth pages.
 const Analytics = lazy(() => import('./pages/Analytics.jsx'))
 const ComingSoon = lazy(() => import('./pages/ComingSoon.jsx'))
+const CommunicationPractice = lazy(() => import('./pages/CommunicationPractice.jsx'))
 const CompleteProfile = lazy(() => import('./pages/CompleteProfile.jsx'))
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
 const InterviewSession = lazy(() => import('./pages/InterviewSession.jsx'))
@@ -66,7 +66,7 @@ function GuestOnly({ children }) {
   return children
 }
 
-const PLACEHOLDER_ROUTES = [{ path: '/coach', title: 'AI Trainer' }]
+const PLACEHOLDER_ROUTES = [{ path: '/pro', title: 'Pro plan' }]
 
 function AppRoutes() {
   return (
@@ -150,6 +150,15 @@ function AppRoutes() {
         element={
           <Protected>
             <Resources />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/practice"
+        element={
+          <Protected>
+            <CommunicationPractice />
           </Protected>
         }
       />

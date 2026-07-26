@@ -33,6 +33,7 @@ npm run preview    # serve the production build locally
 | Variable | Purpose |
 | --- | --- |
 | `VITE_API_BASE_URL` | Base URL of the FastAPI backend |
+| `VITE_ELEVENLABS_AGENT_ID` | Public ElevenLabs agent used by voice practice (an ID, not a key) |
 
 Vite only exposes variables prefixed with `VITE_`, and they are inlined at build
 time — so set them in your host's dashboard before building, not after.
@@ -59,7 +60,7 @@ same tokens as `var(--color-*)` references. Add new colors to `index.css` first.
 ## Structure
 
 - `src/pages/` — one component per route, wired up in `App.jsx`
-- `src/components/` — grouped by feature (`interview`, `passport`, `dashboard`) plus shared `common/`
+- `src/components/` — grouped by feature (`interview`, `passport`, `dashboard`, `practice`) plus shared `common/`
 - `src/api/client.js` — the axios instance every request should go through
 - `src/hooks/useMediaRecorder.js` — microphone/camera capture for interview answers
 - `src/context/UserContext.jsx` — current user state
@@ -94,6 +95,26 @@ components were written against. `src/api/mockMatching.js` reproduces the same
 behaviour in `localStorage` for demo mode, deliberately in the same shape, so the two
 cannot drift apart. Its peers come from `src/data/matching.js`, which mirrors
 `backend/app/data/peers.json` — keep the two in step.
+
+## Communication practice
+
+`/practice` offers two independent modes. Text mode posts to the backend's `/practice/text`
+and renders the corrected sentence with each fix highlighted inline — hover for the
+explanation, click to pin it. Voice mode connects straight to a public ElevenLabs agent with
+`@elevenlabs/react`; the agent does all speech-to-text and text-to-speech, so there is no
+audio code here and no ElevenLabs key in the bundle, only the agent ID.
+
+Voice mode dials the agent as soon as the tab opens, so the browser asks for the microphone
+straight away. Ending the call does not redial — a "Reconnect" button appears instead — and
+auto-connect is capped at two attempts so a refused connection cannot loop.
+
+### What voice mode needs on the ElevenLabs dashboard
+
+Background noise opening a turn is tuned on the agent, not here: the platform does not
+expose voice-detection thresholds to clients, so sensitivity lives in the dashboard's turn
+eagerness and turn timeout settings. What this app does client-side is hold-to-talk — the
+mic stays muted between turns via the SDK's controlled `micMuted`, so room noise cannot
+start a turn at all. A hands-free checkbox restores the always-open mic.
 
 ## Deployment
 

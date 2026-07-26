@@ -116,6 +116,8 @@ free 40 minutes: open two sessions at once, and report a duration of its own cho
 | `LLM_API_KEY` | Google AI Studio key for scoring, question selection, and lead-ins; these fall back to unscored answers, a fixed question order, and the authored lead-ins when empty | empty |
 | `LLM_MODEL` | Gemini model behind scoring, question selection, and lead-ins. Lite by default: one interview costs about a dozen calls, and `gemini-2.5-flash` allows 20 a day on the free tier | `gemini-flash-lite-latest` |
 | `INTERVIEW_GENERATE_LEAD_INS` | Let the model write the sentence before each question. Off uses the authored lead-ins from the bank | `true` |
+| `GEMINI_API_KEY` | Key for the text-mode communication coach; `/practice/text` returns `503` when empty | empty |
+| `GEMINI_MODEL` | Model used by the communication coach | `gemini-3.1-flash-lite` |
 | `SECRET_KEY` | JWT signing secret | `change-me` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT lifetime in minutes | `10080` (7 days) |
 | `CORS_ORIGINS` | Comma-separated origins, or `*` for local dev | `*` |
@@ -198,6 +200,15 @@ so `0912345678`, `912345678`, `251912345678`, and `+251912345678` all persist as
 | `POST` | `/interview/sessions/{id}/complete` | Finish a session, score its answers, update the passport |
 | `GET` | `/interview/sessions/{id}/feedback` | All feedback for a session |
 | `GET` | `/passport/me` | The signed-in user's Skill Passport |
+| `POST` | `/practice/text` | Coach one typed message: corrected text, errors, follow-up |
+
+## Communication practice
+
+Text mode posts to `/practice/text`, which asks Gemini for a strict JSON verdict on one
+message and retries once if the reply will not parse. Voice mode never touches this
+service: the frontend connects straight to a public ElevenLabs agent that holds its own
+prompt, voice, and speech handling, so no ElevenLabs key belongs in this backend and there
+is no token endpoint to call.
 
 ## Peer language exchange
 
@@ -260,6 +271,7 @@ shipping a `.env`, and lock `CORS_ORIGINS` down to the real frontend origin.
 - `app/services/ai_scoring.py` — the rubric prompt and how a reply becomes scores.
 - `app/services/session_scoring.py` — turns a finished session into feedback reports.
 - `app/services/passport_builder.py` — aggregates reports into the Skill Passport.
+- `app/services/practice_coach.py` — the coaching prompt and the Gemini call behind text mode.
 - `app/services/transcription.py` — speech-to-text provider.
 - `app/services/lead_ins.py` — the sentence said before each question, and its guards.
 - `app/services/peer_directory.py` — the partner pool and the rule that ranks it.
