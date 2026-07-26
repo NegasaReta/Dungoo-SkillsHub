@@ -1,41 +1,82 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-export default function useMediaRecorder({ audio = true, video = false } = {}) {
+/**
+ * Camera/microphone capture for interview answers.
+ *
+ * Nothing is requested from the browser until `start` is called, so the consent
+ * step stays in front of the permission prompt.
+ */
+export default function useMediaRecorder({ audio = true, video = true } = {}) {
   const recorderRef = useRef(null)
   const chunksRef = useRef([])
   const streamRef = useRef(null)
+
   const [isRecording, setIsRecording] = useState(false)
-  const [blob, setBlob] = useState(null)
+  const [stream, setStream] = useState(null)
+  const [blobUrl, setBlobUrl] = useState(null)
+  const [seconds, setSeconds] = useState(0)
   const [error, setError] = useState(null)
 
+  const stopTracks = useCallback(() => {
+    streamRef.current?.getTracks().forEach((track) => track.stop())
+    streamRef.current = null
+    setStream(null)
+  }, [])
+
   const start = useCallback(async () => {
+    setError(null)
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio, video })
-      streamRef.current = stream
+      const media = await navigator.mediaDevices.getUserMedia({ audio, video })
+      streamRef.current = media
+      setStream(media)
       chunksRef.current = []
 
-      const recorder = new MediaRecorder(stream)
+      const recorder = new MediaRecorder(media)
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) chunksRef.current.push(event.data)
       }
       recorder.onstop = () => {
-        setBlob(new Blob(chunksRef.current, { type: recorder.mimeType }))
-        stream.getTracks().forEach((track) => track.stop())
+        const recording = new Blob(chunksRef.current, { type: recorder.mimeType })
+        setBlobUrl((previous) => {
+          if (previous) URL.revokeObjectURL(previous)
+          return URL.createObjectURL(recording)
+        })
+        stopTracks()
       }
 
       recorder.start()
       recorderRef.current = recorder
-      setBlob(null)
+      setSeconds(0)
       setIsRecording(true)
-    } catch (err) {
-      setError(err)
+    } catch (cause) {
+      setError(cause)
+      stopTracks()
     }
-  }, [audio, video])
+  }, [audio, video, stopTracks])
 
   const stop = useCallback(() => {
-    recorderRef.current?.stop()
+    if (recorderRef.current?.state === 'recording') recorderRef.current.stop()
     setIsRecording(false)
   }, [])
 
-  return { isRecording, blob, error, start, stop, stream: streamRef.current }
+  const reset = useCallback(() => {
+    stop()
+    setBlobUrl((previous) => {
+      if (previous) URL.revokeObjectURL(previous)
+      return null
+    })
+    setSeconds(0)
+    setError(null)
+  }, [stop])
+
+  useEffect(() => {
+    if (!isRecording) return undefined
+    const timer = setInterval(() => setSeconds((value) => value + 1), 1000)
+    return () => clearInterval(timer)
+  }, [isRecording])
+
+  // Release the camera if the component unmounts mid-recording.
+  useEffect(() => stopTracks, [stopTracks])
+
+  return { isRecording, stream, blobUrl, seconds, error, start, stop, reset }
 }

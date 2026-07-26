@@ -8,7 +8,7 @@ The repository holds two services that run and deploy independently:
 | Directory | Stack | Setup |
 | --- | --- | --- |
 | `frontend/` | React (Vite) PWA | see [frontend/README.md](frontend/README.md) |
-| `backend/` | FastAPI + SQLite | see [backend/README.md](backend/README.md) |
+| `backend/` | FastAPI + Postgres (Neon) | see [backend/README.md](backend/README.md) |
 
 `docs/` holds the non-code material: SRS, diagrams, and pitch deck.
 

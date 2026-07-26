@@ -5,9 +5,15 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.core.config import settings
 
-connect_args = {"check_same_thread": False} if settings.DATABASE_URL.startswith("sqlite") else {}
+connect_args = {"check_same_thread": False} if settings.is_sqlite else {}
 
-engine = create_engine(settings.DATABASE_URL, connect_args=connect_args)
+# Neon closes idle connections, so recycle them and check liveness before handing one out.
+engine = create_engine(
+    settings.sqlalchemy_url,
+    connect_args=connect_args,
+    pool_pre_ping=not settings.is_sqlite,
+    pool_recycle=300 if not settings.is_sqlite else -1,
+)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 

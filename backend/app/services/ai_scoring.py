@@ -3,6 +3,7 @@
 import json
 
 from app.core.config import settings
+from app.services import llm
 
 RUBRIC_PROMPT = """You are an interview coach scoring one answer from a candidate
 applying for the role of {role}.
@@ -10,7 +11,7 @@ applying for the role of {role}.
 Question: {question}
 Answer transcript: {transcript}
 
-Score the answer from 0 to 10 on each dimension:
+Score the answer from 1 to 5 on each dimension:
 - clarity: structure and ease of following the answer
 - confidence: decisiveness and ownership of the work described
 - star: how completely the answer covers Situation, Task, Action, Result
@@ -21,6 +22,9 @@ Reply with JSON only, using exactly these keys:
 """
 
 SCORE_FIELDS = ("clarity", "confidence", "star")
+SCORE_MIN = 1.0
+SCORE_MAX = 5.0
+UNSCORED = 0.0
 
 
 def build_prompt(role: str, question: str, transcript: str) -> str:
@@ -30,10 +34,16 @@ def build_prompt(role: str, question: str, transcript: str) -> str:
 def parse_scores(raw: str) -> dict:
     """Turn a raw LLM reply into a normalised score dict.
 
-    Scores are clamped to 0-10 so a malformed reply cannot skew the passport.
+    Present scores are clamped to 1-5 so a malformed reply cannot skew the passport.
+    A missing axis stays at UNSCORED rather than clamping up to a real 1.
     """
     payload = json.loads(raw)
-    result = {field: min(max(float(payload.get(field, 0)), 0), 10) for field in SCORE_FIELDS}
+    result = {
+        field: min(max(float(payload[field]), SCORE_MIN), SCORE_MAX)
+        if payload.get(field) is not None
+        else UNSCORED
+        for field in SCORE_FIELDS
+    }
     result["summary"] = str(payload.get("summary", ""))
     result["strengths"] = [str(item) for item in payload.get("strengths", [])]
     result["improvements"] = [str(item) for item in payload.get("improvements", [])]
@@ -45,9 +55,9 @@ def score_answer(role: str, question: str, transcript: str) -> dict:
 
     if not settings.LLM_API_KEY:
         return {
-            "clarity": 0.0,
-            "confidence": 0.0,
-            "star": 0.0,
+            "clarity": UNSCORED,
+            "confidence": UNSCORED,
+            "star": UNSCORED,
             "summary": "Scoring unavailable: LLM_API_KEY is not configured.",
             "strengths": [],
             "improvements": [],
@@ -58,4 +68,4 @@ def score_answer(role: str, question: str, transcript: str) -> dict:
 
 def _call_llm(prompt: str) -> str:
     """Send the prompt to the configured provider and return the raw reply."""
-    raise NotImplementedError("Wire up the LLM provider client here.")
+    return llm.generate_json(prompt)

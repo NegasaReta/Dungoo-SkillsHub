@@ -3,10 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#f4f7fb" />
     <link rel="icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.json" />
     <title>Dungoo SkillsHub</title>
+    <script>
+      // Runs before first paint so a dark-mode user never sees a white flash.
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('dungoo.theme')
+          var dark =
+            stored === 'dark' ||
+            ((!stored || stored === 'system') &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches)
+          if (dark) {
+            document.documentElement.classList.add('dark')
+            document
+              .querySelector('meta[name="theme-color"]')
+              .setAttribute('content', '#070b14')
+          }
+        } catch (error) {
+          /* no stored preference available; fall back to light */
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

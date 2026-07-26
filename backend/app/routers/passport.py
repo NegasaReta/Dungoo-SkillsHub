@@ -1,43 +1,26 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.security import get_current_user
 from app.db.database import get_db
-from app.db.models import FeedbackReport, InterviewSession, SkillPassport, User
+from app.db.models import User
 from app.schemas.passport import PassportRead
-from app.services.passport_builder import aggregate_scores
+from app.services import passport_builder
 
 router = APIRouter(prefix="/passport", tags=["passport"])
 
 
-@router.post("/{user_id}/rebuild", response_model=PassportRead)
-def rebuild_passport(user_id: int, db: Session = Depends(get_db)) -> SkillPassport:
-    """Re-aggregate every completed session into the user's passport."""
-    user = db.get(User, user_id)
-    if user is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found")
+@router.get("/me", response_model=PassportRead)
+def my_passport(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> PassportRead:
+    """The signed-in user's credential.
 
-    completed = [s for s in user.interview_sessions if s.status == "completed"]
-    reports = (
-        db.query(FeedbackReport)
-        .join(InterviewSession)
-        .filter(InterviewSession.user_id == user_id, InterviewSession.status == "completed")
-        .all()
-    )
+    Scoped to the token rather than a path id: a passport carries a person's name
+    and how they are performing, which nobody else is entitled to read (NFR-5).
 
-    passport = user.passport or SkillPassport(user_id=user_id)
-    passport.role = user.target_role
-    passport.scores = aggregate_scores(reports)
-    passport.sessions_completed = len(completed)
-
-    db.add(passport)
-    db.commit()
-    db.refresh(passport)
-    return passport
-
-
-@router.get("/{user_id}", response_model=PassportRead)
-def get_passport(user_id: int, db: Session = Depends(get_db)) -> SkillPassport:
-    passport = db.query(SkillPassport).filter(SkillPassport.user_id == user_id).first()
-    if passport is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No passport yet for this user")
-    return passport
+    A candidate with no scored sessions gets an empty passport instead of a 404,
+    so the screen can invite them to their first interview.
+    """
+    return passport_builder.build_credential(db, current_user)
