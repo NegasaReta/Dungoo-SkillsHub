@@ -1,7 +1,16 @@
 import json
 
 import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
+from app.core.security import create_access_token
+from app.db.database import Base, get_db
+from app.db.models import User
+from app.main import app
+from app.services import practice_coach
 from app.services.practice_coach import SYSTEM_PROMPT, build_contents, parse_reply
 
 
@@ -81,3 +90,98 @@ def test_parse_reply_rejects_a_missing_corrected_text():
 def test_parse_reply_rejects_an_empty_reply():
     with pytest.raises(ValueError):
         parse_reply("")
+
+
+# --- the endpoint --------------------------------------------------------------
+
+COACHED = {
+    "corrected_text": "I went to the market.",
+    "errors": [{"original": "goed", "fix": "went", "explanation": "Irregular past tense."}],
+    "follow_up": "What did you buy?",
+}
+
+
+@pytest.fixture
+def client(monkeypatch):
+    engine = create_engine(
+        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+    )
+    Base.metadata.create_all(bind=engine)
+    TestingSession = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
+    def override_get_db():
+        db = TestingSession()
+        try:
+            yield db
+        finally:
+            db.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    # Never call Gemini from a test: the key would be spent and the suite would
+    # only pass while the network and the quota both held.
+    monkeypatch.setattr(practice_coach.settings, "GEMINI_API_KEY", "test-key")
+    monkeypatch.setattr(practice_coach, "coach_message", lambda message, history: COACHED)
+
+    with TestingSession() as seed:
+        seed.add(User(id=1, email="learner@example.com", hashed_password="x"))
+        seed.commit()
+
+    yield TestClient(app, headers={"Authorization": f"Bearer {create_access_token(1)}"})
+    app.dependency_overrides.clear()
+
+
+def _ask(client, message="I goed to the market.", **kwargs):
+    return client.post(
+        "/practice/text", json={"message": message, "conversation_history": []}, **kwargs
+    )
+
+
+def test_coaching_requires_a_token(client):
+    """Every reply spends the project's Gemini quota, so it cannot be open to anyone."""
+    anonymous = TestClient(app)
+
+    assert _ask(anonymous).status_code == 401
+
+
+def test_a_signed_in_learner_gets_their_corrections(client):
+    body = _ask(client).json()
+
+    assert body["corrected_text"] == COACHED["corrected_text"]
+    assert body["errors"][0]["fix"] == "went"
+    assert body["follow_up"] == COACHED["follow_up"]
+
+
+def test_history_reaches_the_coach(client, monkeypatch):
+    seen = {}
+
+    def record(message, history):
+        seen.update(message=message, history=history)
+        return COACHED
+
+    monkeypatch.setattr(practice_coach, "coach_message", record)
+    client.post(
+        "/practice/text",
+        json={
+            "message": "And then?",
+            "conversation_history": [{"role": "assistant", "content": "What did you buy?"}],
+        },
+    )
+
+    assert seen["message"] == "And then?"
+    assert seen["history"] == [{"role": "assistant", "content": "What did you buy?"}]
+
+
+def test_a_missing_key_is_reported_as_unavailable_not_as_a_crash(client, monkeypatch):
+    monkeypatch.setattr(practice_coach.settings, "GEMINI_API_KEY", "")
+
+    assert _ask(client).status_code == 503
+
+
+def test_an_unusable_reply_becomes_a_bad_gateway(client, monkeypatch):
+    def unusable(message, history):
+        raise practice_coach.CoachError("Gemini did not return valid JSON")
+
+    monkeypatch.setattr(practice_coach, "coach_message", unusable)
+
+    assert _ask(client).status_code == 502

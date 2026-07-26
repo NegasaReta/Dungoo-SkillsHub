@@ -210,6 +210,14 @@ service: the frontend connects straight to a public ElevenLabs agent that holds 
 prompt, voice, and speech handling, so no ElevenLabs key belongs in this backend and there
 is no token endpoint to call.
 
+The endpoint requires a signed-in user. Nothing in a reply is private — it depends only on
+the message sent — but every call spends the project's Gemini quota, and an open endpoint
+on a public URL is a free way for a stranger to exhaust it.
+
+Nothing is persisted. The client replays the conversation on each request, which keeps the
+service stateless but means a practice session vanishes on refresh and never reaches the
+Skill Passport.
+
 ## Peer language exchange
 
 | Method | Path | Purpose |
