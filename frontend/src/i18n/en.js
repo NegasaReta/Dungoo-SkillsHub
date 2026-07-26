@@ -219,6 +219,24 @@ export const strings = {
       languagesTitle: 'Available in',
       languages: ['Amharic', 'Afaan Oromoo', 'Tigrinya', 'English'],
       platformTitle: 'Platform',
+      productTitle: 'Product',
+      companyTitle: 'Company',
+      legalTitle: 'Legal',
+      product: [
+        { to: '/interview', label: 'AI Interview' },
+        { to: '/passport', label: 'Skill Passport' },
+        { to: '/matching', label: 'Peer Learning' },
+        { to: '/analytics', label: 'Analytics' },
+        { to: '/resources', label: 'Resources' },
+      ],
+      company: [
+        { to: '/about', label: 'About' },
+        { to: '/contact', label: 'Contact' },
+      ],
+      legal: [
+        { to: '/privacy', label: 'Privacy' },
+        { to: '/terms', label: 'Terms' },
+      ],
       rights: '© {year} Dungoo Software Solutions. All rights reserved.',
     },
 
@@ -226,6 +244,233 @@ export const strings = {
       clarity: 'Clarity',
       confidence: 'Confidence',
       star: 'STAR structure',
+    },
+  },
+
+  /*
+   * The pages the footer links out to. Everything the privacy page claims is
+   * checkable in the code: video stays on the device (useEngagementTracker posts
+   * a summary, never frames), answer audio is transcribed and only the text is
+   * stored (InterviewTurn.transcript), and the three providers named are the ones
+   * app/services actually calls.
+   */
+  site: {
+    label: 'dungoosolutions.com',
+    href: 'https://www.dungoosolutions.com',
+  },
+
+  /* Shared by the footer and the contact page. `handle` is what a reader sees. */
+  social: {
+    title: 'Follow along',
+    links: [
+      {
+        id: 'facebook',
+        label: 'Facebook',
+        handle: 'Dungoo Software Solutions',
+        href: 'https://www.facebook.com/people/Dungoo-Software-Solutions/61578495791355/',
+      },
+      {
+        id: 'linkedin',
+        label: 'LinkedIn',
+        handle: 'Dungoo Software Solutions',
+        href: 'https://www.linkedin.com/company/112508380',
+      },
+      {
+        id: 'x',
+        label: 'X',
+        handle: '@dungoosolutions',
+        href: 'https://x.com/dungoosolutions',
+      },
+      {
+        id: 'instagram',
+        label: 'Instagram',
+        handle: '@dungoosolutions',
+        href: 'https://www.instagram.com/dungoosolutions',
+      },
+      {
+        id: 'telegram',
+        label: 'Telegram',
+        handle: '@dungoosolutions',
+        href: 'https://t.me/dungoosolutions',
+      },
+    ],
+  },
+
+  pages: {
+    // Right domain, but the mailbox names are still assumed — confirm both exist
+    // before launch, or point them at an inbox that does.
+    supportEmail: 'hello@dungoosolutions.com',
+    privacyEmail: 'privacy@dungoosolutions.com',
+    updated: 'Last updated July 2026',
+    contactNote: 'Anything we have not answered here:',
+    contactNoteLink: 'get in touch',
+
+    about: {
+      eyebrow: 'About',
+      title: 'Career readiness for Ethiopian youth',
+      lead: 'Dungoo SkillsHub is where you practise the conversation that decides the job — on camera, in your own time, with feedback specific enough to act on.',
+      sections: [
+        {
+          title: 'Why we built it',
+          body: [
+            'Ethiopia’s economy has grown at around 7% a year while youth unemployment stayed high. The gap is rarely technical qualification. It is the interview itself: professional English under pressure, structuring an answer so it lands, and the confidence that only comes from having done it before.',
+            'An education that rewards memorisation gives nobody that practice. A candidate can be entirely qualified and still lose the role in the first ten minutes.',
+          ],
+        },
+        {
+          title: 'What the platform does',
+          list: [
+            'AI Interview — a spoken interview drawn from a fixed question bank for your role. Every answer is scored 1 to 5 on clarity, confidence, and STAR structure, with a line of feedback per axis.',
+            'Peer Learning — forty minutes a day of language exchange, matched both ways across Amharic, Afaan Oromoo, Tigrinya, and English. They practise what you speak, you practise what they speak.',
+            'Skill Passport — every scored session builds one credential page showing where you started, where you are now, and what you have finished.',
+            'Analytics and Resources — your score history over time, and guides and drills aimed at whichever axis is weakest.',
+          ],
+        },
+        {
+          title: 'How the scoring works',
+          body: [
+            'Questions come from a fixed bank per role rather than being invented on the spot, so two people practising the same role sit the same interview. Your spoken answer is transcribed, then scored against the question it answered.',
+            'Those scores are practice feedback, not an accreditation. They are useful because they are consistent and specific, not because anyone has certified them.',
+          ],
+        },
+        {
+          title: 'Where we are',
+          body: [
+            'This is an early build. The interview room, Skill Passport, analytics, and resource library work end to end. Peer Learning is a preview running against a demo pool of partners. A marketplace and employer-side verification are on the roadmap, not in the product — we would rather show you four things that work than twelve that nearly do.',
+          ],
+        },
+        {
+          title: 'Who we are',
+          body: [
+            'SkillsHub is a product of Dungoo Software Solutions, built in Ethiopia for people entering the Ethiopian job market.',
+          ],
+        },
+      ],
+    },
+
+    privacy: {
+      eyebrow: 'Privacy',
+      title: 'Privacy policy',
+      lead: 'The short version: your video never leaves your device, your answer audio is transcribed and then dropped, and we keep the text and the scores because that is what your Skill Passport is made of.',
+      sections: [
+        {
+          title: 'What we collect',
+          list: [
+            'Account details — your name, your email address, and your password stored only as a bcrypt hash. The password itself is never written down anywhere we can read it.',
+            'Profile details — target role, industry, education level, the languages you speak, and the ones you want to practise.',
+            'Practice data — the transcript of each answer, the scores and feedback written for it, when the session ran, and a summary of how you held the camera.',
+          ],
+        },
+        {
+          title: 'Your camera and your recordings',
+          list: [
+            'Video is never uploaded. The camera feed is analysed on your own device, and only a numeric summary — how steadily you stayed in frame and held eye contact — is sent when the session ends.',
+            'Audio of a spoken answer is uploaded so it can be transcribed. The transcript is stored; the audio is not written to our database.',
+            'Nothing is captured until you tick the consent box and join the room, and leaving the room ends the capture.',
+          ],
+        },
+        {
+          title: 'Services we send data to',
+          body: [
+            'Running this in a browser means some steps happen elsewhere. Each service receives only what that step needs, and none of them receive your email address, your password, or anything identifying you beyond the answer itself.',
+          ],
+          list: [
+            'ElevenLabs — transcribes a recorded answer, and gives the interviewer its voice.',
+            'Addis Assistant — transcribes answers spoken in Ethiopian languages.',
+            'Google Gemini — scores a transcript against the question it answered, and writes the interviewer’s short lead-in lines.',
+          ],
+        },
+        {
+          title: 'How long we keep it',
+          body: [
+            'Your account and practice data stay until you ask us to remove them. Self-serve deletion has not shipped yet, so for now write to us and we will delete the account and everything attached to it.',
+          ],
+        },
+        {
+          title: 'How it is protected',
+          body: [
+            'Traffic runs over HTTPS. Passwords are hashed with bcrypt, sign-in uses signed tokens that expire, and every interview endpoint checks that the session belongs to whoever is asking before it answers.',
+            'This is an early product from a small team, and it has not been through an external security audit. We would rather say so than imply otherwise.',
+          ],
+        },
+      ],
+    },
+
+    terms: {
+      eyebrow: 'Terms',
+      title: 'Terms of use',
+      lead: 'Plain language, because you should not need a lawyer to know what you agreed to.',
+      sections: [
+        {
+          title: 'The service',
+          body: [
+            'Dungoo SkillsHub gives you interview practice, peer language exchange, and a record of both. It is provided by Dungoo Software Solutions, as it is, while it is still being built.',
+          ],
+        },
+        {
+          title: 'Your account',
+          list: [
+            'Use an email address you control, and keep your password to yourself. Anything done through your account is treated as done by you.',
+            'You need to be at least 16, or to have a parent or guardian’s permission.',
+            'One person per account. Shared logins make the scores meaningless anyway.',
+          ],
+        },
+        {
+          title: 'Practising with other people',
+          list: [
+            'A peer session is between two people who both chose to be there. Do not record your partner, and do not submit someone else’s voice as your answer.',
+            'Harassment, hate speech, or using a session to sell something ends the account.',
+          ],
+        },
+        {
+          title: 'What your scores mean',
+          body: [
+            'The Skill Passport is a record of practice. It shows what you did and how our model scored it. It is not a qualification, an accreditation, or a promise of employment, and we do not present it to anyone as one.',
+            'Scores come from an AI model, so some of them will be wrong. Treat a score as a coach’s opinion rather than a verdict.',
+          ],
+        },
+        {
+          title: 'Availability',
+          body: [
+            'Features arrive, change, and occasionally break. We do not promise uptime, and a session can fail when a speech or scoring provider is unavailable.',
+          ],
+        },
+        {
+          title: 'Ending things',
+          body: [
+            'You can stop using SkillsHub whenever you like and ask us to delete your account. We can suspend an account that breaks these terms.',
+          ],
+        },
+        {
+          title: 'Changes and governing law',
+          body: [
+            'If these terms change in a way that matters, we will say so here and move the date at the top. They are governed by the laws of the Federal Democratic Republic of Ethiopia.',
+          ],
+        },
+      ],
+    },
+
+    contact: {
+      eyebrow: 'Contact',
+      title: 'Talk to us',
+      lead: 'A small team building this in Addis Ababa. Real replies, usually within a few working days.',
+      channels: [
+        {
+          title: 'Support',
+          body: 'Something broke, a score looked wrong, or a session would not start.',
+          kind: 'support',
+        },
+        {
+          title: 'Privacy and your data',
+          body: 'Ask what we hold about you, or ask us to delete it.',
+          kind: 'privacy',
+        },
+      ],
+      locationTitle: 'Where we are',
+      location: 'Addis Ababa, Ethiopia',
+      ctaTitle: 'Not a question — you just want to try it?',
+      ctaBody: 'Signing up takes a minute, and the first mock interview takes about ten.',
+      ctaAction: 'Create an account',
     },
   },
 
@@ -239,14 +484,24 @@ export const strings = {
     description: 'Choose how Dungoo SkillsHub looks. System follows your device setting.',
   },
 
+  sidebar: {
+    ctaTitle: 'Ready to practise?',
+    ctaBody: 'One mock interview takes about ten minutes and updates your Skill Passport.',
+    ctaAction: 'Start AI Interview',
+  },
+
   topbar: {
-    searchLabel: 'Search skills, coaches, or lessons',
-    searchPlaceholder: 'Search skills, coaches, or lessons...',
-    searchEmpty: 'No matches yet. Try “interview”, “passport”, or “analytics”.',
+    // The search jumps between pages and actions, so the copy says that rather
+    // than promising coaches and lessons it cannot find.
+    searchLabel: 'Search pages and actions',
+    searchPlaceholder: 'Jump to a page or action…',
+    searchEmpty: 'Nothing matches. Try “interview”, “passport”, or “analytics”.',
+    searchHint: 'Use the arrow keys to choose, Enter to open.',
+    searchResults: 'Search results',
     openNavigation: 'Open navigation',
     closeNavigation: 'Close navigation',
-    explore: 'Explore',
-    community: 'Community',
+    navigation: 'Main navigation',
+    skipToContent: 'Skip to main content',
     help: 'Help and shortcuts',
     account: 'Account menu',
   },
@@ -259,6 +514,7 @@ export const strings = {
     shortcutsTitle: 'Handy to know',
     shortcuts: [
       'Recordings never leave your device — only the answer text is scored.',
+      'Press Ctrl+K (⌘K on Mac) to jump to any page.',
       'Press Esc to close any menu.',
       'Switch between light and dark from your profile menu.',
     ],
@@ -266,7 +522,7 @@ export const strings = {
 
   account: {
     menuLabel: 'Account',
-    viewProfile: 'Profile and settings',
+    manageAccount: 'Manage account',
     appearance: 'Appearance',
     signOut: 'Sign out',
     signedInAs: 'Signed in as',

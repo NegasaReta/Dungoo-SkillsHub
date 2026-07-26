@@ -17,7 +17,31 @@ export const DEFAULT_OPTIONS = {
     'retail',
     'other',
   ],
-  languages: ['amharic', 'english', 'afaan_oromo', 'tigrinya', 'somali', 'other'],
+  // Same order the backend serves: the ten largest Ethiopian languages, then the
+  // ten most spoken worldwide. Display names live in data/languages.js.
+  languages: [
+    'afaan_oromo',
+    'amharic',
+    'somali',
+    'tigrinya',
+    'sidamo',
+    'wolaytta',
+    'gurage',
+    'afar',
+    'hadiyya',
+    'gamo',
+    'english',
+    'mandarin',
+    'hindi',
+    'spanish',
+    'arabic',
+    'french',
+    'bengali',
+    'portuguese',
+    'indonesian',
+    'urdu',
+    'other',
+  ],
 }
 
 // The exact key names the backend will use are not settled yet, so accept the

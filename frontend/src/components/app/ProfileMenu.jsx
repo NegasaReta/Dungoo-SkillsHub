@@ -64,7 +64,7 @@ export default function ProfileMenu() {
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-primary/80 transition-colors hover:bg-surface hover:text-primary"
             >
               <NavIcon name="settings" className="h-4 w-4" />
-              {strings.account.viewProfile}
+              {strings.account.manageAccount}
             </Link>
 
             <button

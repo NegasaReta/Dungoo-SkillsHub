@@ -16,6 +16,7 @@ from app.core.security import (
 from app.db.database import get_db
 from app.db.models import PasswordResetToken, User, utcnow
 from app.schemas.user import (
+    ChangePasswordRequest,
     ForgotPasswordRequest,
     ForgotPasswordResponse,
     LoginRequest,
@@ -75,6 +76,35 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse
 @router.get("/me", response_model=UserMe)
 def me(current_user: User = Depends(get_current_user)) -> User:
     return current_user
+
+
+@router.post("/change-password", response_model=MessageResponse)
+def change_password(
+    payload: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> MessageResponse:
+    if not verify_password(payload.current_password, current_user.hashed_password):
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, detail="Your current password is not correct."
+        )
+    if payload.current_password == payload.new_password:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail="Your new password must be different from your current one.",
+        )
+
+    current_user.hashed_password = hash_password(payload.new_password)
+
+    # Any reset link already in flight would still work against the old grant, so
+    # changing the password deliberately retires them.
+    db.query(PasswordResetToken).filter(
+        PasswordResetToken.user_id == current_user.id,
+        PasswordResetToken.used_at.is_(None),
+    ).delete()
+    db.commit()
+
+    return MessageResponse(message="Your password has been changed.")
 
 
 @router.post("/forgot-password", response_model=ForgotPasswordResponse)

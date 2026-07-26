@@ -140,10 +140,28 @@ Addis AI takes Amharic and Afan Oromo whatever `STT_PROVIDER` says.
 | `POST` | `/auth/signup` | Create user (email/password), return JWT |
 | `POST` | `/auth/login` | Verify credentials, return JWT |
 | `GET` | `/auth/me` | Current user (Bearer token) |
+| `POST` | `/auth/change-password` | Change the password of the signed-in user |
 | `POST` | `/auth/forgot-password` | Issue a password reset link |
 | `POST` | `/auth/reset-password` | Set a new password from a reset token |
 | `POST` | `/profile/complete` | Save onboarding profile fields |
 | `GET` | `/meta/options` | Allowed education / industry / language values |
+
+### Changing a password while signed in
+
+`/auth/change-password` takes `current_password` and `new_password` and is the flow for
+someone who can already log in, so proving the current password is what authorises the
+change. It also deletes any unused reset token for that account, since a link already in
+flight would otherwise still grant a second way in. Issued JWTs stay valid until they
+expire: revoking them would need a token store, which this build does not have.
+
+### Languages
+
+`/meta/options` serves the ten largest languages of Ethiopia (by share of speakers in
+the 2007 census) followed by the ten most spoken languages worldwide (by first- plus
+second-language speakers, per Ethnologue), then `other`. `/profile/complete` takes both
+`languages`, what the member already speaks, and the optional `practising_languages`,
+what they want to practise; peer matching pairs one against the other. Both are validated
+against the same allowlist.
 
 ### Password reset
 

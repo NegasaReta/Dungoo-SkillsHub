@@ -14,18 +14,27 @@ import { DAILY_LIMIT_SECONDS, formatDuration } from '../lib/exchange.js'
 import { rankPeers } from '../lib/matching.js'
 
 /**
- * Seeds the pairing form from the profile: languages the user listed at onboarding
- * are what they can offer, so anything left over is what they might want to learn.
+ * Seeds the pairing form from the profile, so nobody has to answer in two places:
+ * languages the member speaks are what they can offer, and the ones they said they
+ * want to practise are what they are looking for. Profiles saved before that second
+ * field existed fall back to guessing from whatever they did not list.
+ *
+ * Narrowed to EXCHANGE_LANGUAGES because that is what the peer pool actually speaks —
+ * a profile may well list languages no partner offers yet.
  */
 function initialFilters(user) {
   const speaks = (user?.languages ?? []).filter((language) =>
     EXCHANGE_LANGUAGES.includes(language)
   )
+  const wants = (user?.practising_languages ?? []).filter((language) =>
+    EXCHANGE_LANGUAGES.includes(language)
+  )
   const remaining = EXCHANGE_LANGUAGES.filter((language) => !speaks.includes(language))
+  const guessed = remaining.includes('english') ? ['english'] : remaining.slice(0, 1)
 
   return {
     speaks: speaks.length ? speaks : ['amharic'],
-    wants: remaining.includes('english') ? ['english'] : remaining.slice(0, 1),
+    wants: wants.length ? wants : guessed,
     industry: 'any',
     level: 'any',
     onlineOnly: false,

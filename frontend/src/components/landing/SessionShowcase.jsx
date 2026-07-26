@@ -19,7 +19,7 @@ export default function SessionShowcase() {
         className="orb orb-accent pointer-events-none absolute -left-32 top-1/4 h-72 w-72"
       />
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+      <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 sm:px-6 lg:px-8 lg:grid-cols-[1.1fr_1fr]">
         <Reveal>
           <figure className="lift sheen overflow-hidden rounded-3xl border border-primary/10 bg-navy p-2 shadow-2xl shadow-navy/25">
             <picture>
@@ -41,14 +41,14 @@ export default function SessionShowcase() {
 
         <Reveal delay={120}>
           <p className="font-medium text-link">{t.eyebrow}</p>
-          <h2 className="mt-2 text-3xl font-bold leading-tight text-primary md:text-5xl">
+          <h2 className="mt-2 text-3xl font-bold leading-tight text-primary md:text-4xl">
             {t.title}
           </h2>
-          <p className="mt-5 text-lg leading-relaxed text-primary/70">{t.body}</p>
+          <p className="mt-4 leading-relaxed text-primary/70">{t.body}</p>
 
-          <ul className="mt-7 space-y-3.5">
+          <ul className="mt-8 space-y-4">
             {t.points.map((point) => (
-              <li key={point} className="flex gap-3 text-base leading-relaxed text-primary/75">
+              <li key={point} className="flex gap-3 leading-relaxed text-primary/75">
                 <Icon name="check" className="mt-1 h-5 w-5 shrink-0 text-success" />
                 {point}
               </li>

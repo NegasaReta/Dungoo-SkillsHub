@@ -22,6 +22,9 @@ class User(Base):
     industries: Mapped[list[str]] = mapped_column(JSON, default=list)
     phone_number: Mapped[str | None] = mapped_column(String(32), nullable=True)
     languages: Mapped[list[str]] = mapped_column(JSON, default=list)
+    # Languages the member wants to practise, as opposed to the ones they already
+    # speak. Peer matching pairs one against the other.
+    practising_languages: Mapped[list[str]] = mapped_column(JSON, default=list)
     profile_completed: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 

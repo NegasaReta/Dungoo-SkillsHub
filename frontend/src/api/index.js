@@ -19,6 +19,7 @@ export const {
   fetchMe,
   completeProfile,
   fetchOptions,
+  changePassword,
   requestPasswordReset,
   resetPassword,
 } = api

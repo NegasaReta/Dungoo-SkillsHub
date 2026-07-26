@@ -3,6 +3,7 @@ import NavIcon from '../components/app/NavIcon.jsx'
 import Panel from '../components/dashboard/Panel.jsx'
 import ThemeChoice from '../components/common/ThemeChoice.jsx'
 import AvatarUploader from '../components/profile/AvatarUploader.jsx'
+import ChangePasswordForm from '../components/profile/ChangePasswordForm.jsx'
 import ProfileForm from '../components/profile/ProfileForm.jsx'
 import { useUser } from '../context/UserContext.jsx'
 import { strings } from '../i18n/en.js'
@@ -65,6 +66,17 @@ export default function Settings() {
         </Panel>
 
         <Panel>
+          <h2 className="text-base font-semibold text-primary">Password</h2>
+          <p className="mt-1 text-sm text-primary/60">
+            Confirm the password you use now, then choose a new one. Sessions already signed in
+            elsewhere are not ended, so sign out of any shared device afterwards.
+          </p>
+          <div className="mt-5">
+            <ChangePasswordForm />
+          </div>
+        </Panel>
+
+        <Panel>
           <h2 className="text-base font-semibold text-primary">Account</h2>
 
           <dl className="mt-4 divide-y divide-primary/10">
@@ -78,13 +90,6 @@ export default function Settings() {
               </span>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 py-3">
-              <div>
-                <dt className="text-sm font-medium text-primary">Password</dt>
-                <dd className="text-sm text-primary/60">••••••••</dd>
-              </div>
-              <span className="text-xs text-primary/45">Password changes are not available yet</span>
-            </div>
           </dl>
 
           <button

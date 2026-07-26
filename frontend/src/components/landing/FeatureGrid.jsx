@@ -19,10 +19,10 @@ export default function FeatureGrid() {
         className="orb orb-accent pointer-events-none absolute -left-28 top-1/4 h-72 w-72"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4">
-        <Reveal className="max-w-4xl">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <Reveal className="max-w-2xl">
           <p className="font-medium text-link">{t.eyebrow}</p>
-          <h2 className="mt-2 text-3xl font-bold text-primary md:text-5xl">{t.title}</h2>
+          <h2 className="mt-2 text-3xl font-bold text-primary md:text-4xl">{t.title}</h2>
         </Reveal>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -36,7 +36,7 @@ export default function FeatureGrid() {
                   <Icon name={feature.icon} />
                 </span>
                 <div className="mt-5 flex items-start justify-between gap-3">
-                  <h3 className="text-xl font-semibold text-primary">{feature.title}</h3>
+                  <h3 className="text-lg font-semibold text-primary">{feature.title}</h3>
                   <span
                     className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
                       STATUS_STYLES[feature.status]
@@ -45,7 +45,7 @@ export default function FeatureGrid() {
                     {feature.status}
                   </span>
                 </div>
-                <p className="mt-2 text-base leading-relaxed text-primary/70">{feature.body}</p>
+                <p className="mt-2 text-sm leading-relaxed text-primary/70">{feature.body}</p>
               </TiltCard>
             </Reveal>
           ))}

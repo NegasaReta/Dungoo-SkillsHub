@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.db.database import Base, engine
+from app.db.migrate import ensure_columns
 from app.routers import auth, interview, meta, passport, practice, profile
 
 Base.metadata.create_all(bind=engine)
+ensure_columns(engine)
 
 app = FastAPI(title=settings.PROJECT_NAME)
 

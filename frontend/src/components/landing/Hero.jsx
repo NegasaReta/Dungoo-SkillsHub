@@ -25,23 +25,21 @@ export default function Hero() {
       />
       <HeroBackdrop />
 
-      <div className="relative mx-auto grid max-w-7xl gap-14 px-4 py-16 md:py-24 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-20">
+      <div className="relative mx-auto grid max-w-6xl gap-14 px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:grid-cols-2 lg:items-center">
         <div className="rise-in">
           <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm text-link shadow-sm">
             <Icon name="globe" className="h-4 w-4" />
             {t.badge}
           </span>
 
-          <h1 className="mt-5 text-4xl font-bold leading-[1.08] text-primary md:text-6xl lg:text-7xl">
+          <h1 className="mt-5 text-4xl font-bold leading-[1.1] text-primary md:text-6xl">
             {t.titleLead}
             <span className="mt-2 block bg-gradient-to-r from-link via-brand-blue to-accent bg-clip-text text-transparent">
               {t.titleAccent}
             </span>
           </h1>
 
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-primary/70 md:text-xl">
-            {t.body}
-          </p>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-primary/70">{t.body}</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button
@@ -64,7 +62,7 @@ export default function Hero() {
             </Button>
           </div>
 
-          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-base text-primary/60">
+          <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-primary/60">
             {t.trust.map((item) => (
               <li key={item} className="inline-flex items-center gap-1.5">
                 <Icon name="check" className="h-4 w-4 text-success" />
