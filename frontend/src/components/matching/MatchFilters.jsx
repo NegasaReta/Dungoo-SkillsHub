@@ -1,19 +1,22 @@
-import {
-  EXCHANGE_LANGUAGES,
-  MATCHING_INDUSTRIES,
-  SKILL_LEVELS,
-} from '../../data/matching.js'
+import { EXCHANGE_LANGUAGES, SKILL_LEVELS } from '../../data/matching.js'
 import { humanize } from '../../lib/labels.js'
 import NavIcon from '../app/NavIcon.jsx'
 import Panel from '../dashboard/Panel.jsx'
 
-function LanguagePicker({ id, title, hint, selected, onToggle }) {
+/** Stands in until /matching/options answers, so the filters never render empty. */
+const FALLBACK_OPTIONS = {
+  languages: EXCHANGE_LANGUAGES,
+  levels: SKILL_LEVELS,
+  industries: [],
+}
+
+function LanguagePicker({ id, title, hint, languages, selected, onToggle }) {
   return (
     <Panel>
       <h2 className="text-sm font-semibold text-primary">{title}</h2>
       <p className="mt-0.5 text-xs text-primary/50">{hint}</p>
       <ul className="mt-3 space-y-2">
-        {EXCHANGE_LANGUAGES.map((language) => (
+        {languages.map((language) => (
           <li key={language}>
             <label className="flex cursor-pointer items-center gap-2.5 text-sm text-primary/80">
               <input
@@ -32,7 +35,9 @@ function LanguagePicker({ id, title, hint, selected, onToggle }) {
   )
 }
 
-export default function MatchFilters({ filters, onChange }) {
+export default function MatchFilters({ filters, onChange, options }) {
+  const { languages, levels, industries } = options ?? FALLBACK_OPTIONS
+
   const toggle = (field) => (language) => {
     const current = filters[field]
     onChange({
@@ -49,6 +54,7 @@ export default function MatchFilters({ filters, onChange }) {
         id="speaks"
         title="You speak"
         hint="What you can offer a partner"
+        languages={languages}
         selected={filters.speaks}
         onToggle={toggle('speaks')}
       />
@@ -57,6 +63,7 @@ export default function MatchFilters({ filters, onChange }) {
         id="wants"
         title="You want to practise"
         hint="What you are looking for"
+        languages={languages}
         selected={filters.wants}
         onToggle={toggle('wants')}
       />
@@ -71,9 +78,10 @@ export default function MatchFilters({ filters, onChange }) {
           onChange={(event) => onChange({ ...filters, industry: event.target.value })}
           className="mt-3 w-full rounded-lg border border-primary/15 bg-surface px-3 py-2.5 text-sm text-primary outline-none focus:border-brand-blue"
         >
-          {MATCHING_INDUSTRIES.map((industry) => (
-            <option key={industry.id} value={industry.id}>
-              {industry.label}
+          <option value="any">Any industry</option>
+          {industries.map((industry) => (
+            <option key={industry} value={industry}>
+              {humanize(industry)}
             </option>
           ))}
         </select>
@@ -82,7 +90,7 @@ export default function MatchFilters({ filters, onChange }) {
       <Panel>
         <h2 className="text-sm font-semibold text-primary">Partner level</h2>
         <div className="mt-3 flex flex-wrap gap-2">
-          {['any', ...SKILL_LEVELS].map((level) => {
+          {['any', ...levels].map((level) => {
             const active = filters.level === level
             return (
               <button
@@ -95,7 +103,7 @@ export default function MatchFilters({ filters, onChange }) {
                     : 'border border-primary/15 text-primary/70 hover:border-brand-blue/40'
                 }`}
               >
-                {level === 'any' ? 'Any' : level}
+                {level === 'any' ? 'Any' : humanize(level)}
               </button>
             )
           })}

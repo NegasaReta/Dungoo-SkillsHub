@@ -77,6 +77,24 @@ Scores use the 1-5 rubric and `0` means "not scored yet", which is why they go
 through `src/lib/scores.js` instead of being formatted inline: a zero has to render
 as a dash, never as 0.0.
 
+## Peer matching
+
+`/matching` gets both its partners and its clock from the backend. Nothing on this
+page counts time: the 40-minute daily allowance is only a limit if the side being
+limited is not the side doing the counting, and it used to live in `localStorage`
+where clearing one key bought an unlimited day.
+
+So `useExchangeSession` sends *start*, *pause*, *resume*, and *end*, and takes the
+returned numbers as the truth. It does tick once a second, but only so the countdown
+moves between requests — that estimate is overwritten by every response, and
+corrected on a slow poll and whenever the tab is brought back into view.
+
+`src/api/matching.js` is where the server's snake_case becomes the camelCase the
+components were written against. `src/api/mockMatching.js` reproduces the same
+behaviour in `localStorage` for demo mode, deliberately in the same shape, so the two
+cannot drift apart. Its peers come from `src/data/matching.js`, which mirrors
+`backend/app/data/peers.json` — keep the two in step.
+
 ## Deployment
 
 `vercel.json` sets the build output and the SPA rewrite so client-side routes

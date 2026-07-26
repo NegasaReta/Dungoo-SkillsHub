@@ -7,11 +7,14 @@ import * as mockApi from './mockApi.js'
 import * as httpApi from './client.js'
 import * as mockInterview from './mockInterview.js'
 import * as httpInterview from './interview.js'
+import * as mockMatching from './mockMatching.js'
+import * as httpMatching from './matching.js'
 
 export const usingMockApi = import.meta.env.VITE_USE_MOCK_API !== 'false'
 
 const api = usingMockApi ? mockApi : httpApi
 const interview = usingMockApi ? mockInterview : httpInterview
+const matching = usingMockApi ? mockMatching : httpMatching
 
 export const {
   signup,
@@ -28,5 +31,19 @@ export const {
 // session never reaches the Skill Passport or dashboard while running on mocks.
 export const { fetchQuestions, createSession, submitResponse, completeSession, fetchSessions } =
   interview
+
+// Peer exchange. The live versions time sessions on the server; the mock keeps
+// the same shape in localStorage so the page works without a backend.
+export const {
+  fetchMatchingOptions,
+  fetchPeers,
+  fetchAllowance,
+  fetchExchangeState,
+  startExchangeSession,
+  pauseExchangeSession,
+  resumeExchangeSession,
+  endExchangeSession,
+  fetchExchangeSessions,
+} = matching
 
 export { clearToken, getToken, setToken } from '../lib/token.js'

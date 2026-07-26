@@ -7,6 +7,7 @@ const LABEL_OVERRIDES = {
   tvet: 'TVET',
   phd: 'PhD',
   afaan_oromo: 'Afaan Oromo',
+  tech: 'Tech & Software',
 }
 
 export function humanize(value) {

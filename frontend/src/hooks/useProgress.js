@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { fetchSessions, usingMockApi } from '../api/index.js'
+import { fetchExchangeSessions, fetchSessions, usingMockApi } from '../api/index.js'
 import { useUser } from '../context/UserContext.jsx'
 import { EMPTY_PRACTICE, practiceSummary, toEvents } from '../lib/activity.js'
 import { readDemoSessions } from '../lib/demoData.js'
@@ -9,10 +9,9 @@ import { EMPTY_SUMMARY, summarizeSessions } from '../lib/progress.js'
 
 /**
  * Loads every kind of practice history and reduces it for the pages that report on
- * progress. Interview sessions come from the API; peer exchange sessions are local
- * to the FR-2 mockup. A failure on either side is reported but still yields empty
- * summaries, so those pages degrade to their "no history yet" state rather than
- * breaking.
+ * progress. Both interviews and peer exchanges come from the API. A failure on
+ * either side is reported but still yields empty summaries, so those pages degrade
+ * to their "no history yet" state rather than breaking.
  */
 /**
  * Sample history lives in the browser, so the real API never returns it and it has
@@ -37,7 +36,14 @@ export default function useProgress() {
     setLoading(true)
     setError(null)
 
-    setExchanges(readExchangeSessions())
+    // Seeded sample exchanges only ever live in the browser, so they are added to
+    // whatever the server knows about rather than replaced by it.
+    const seeded = usingMockApi ? [] : readExchangeSessions().filter((entry) => entry.demo)
+    try {
+      setExchanges([...seeded, ...(await fetchExchangeSessions())])
+    } catch {
+      setExchanges(usingMockApi ? readExchangeSessions() : seeded)
+    }
 
     const demo = demoHistory(user?.id)
 

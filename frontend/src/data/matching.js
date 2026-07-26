@@ -1,23 +1,17 @@
 /**
- * Placeholder peers for the language-exchange mockup (FR-2, mockup/roadmap scope).
- * Live matching against real accounts is not part of the hackathon build, but the
- * pairing rule shown here is the real one: a match needs a peer who speaks what
- * you want to practise AND wants to practise what you speak.
+ * Placeholder peers for demo mode and for seeding sample history.
+ *
+ * The live page gets its partners from the backend, which keeps the same six in
+ * app/data/peers.json. This copy exists so the app still works with no server
+ * behind it — keep the two in step, or demo mode will show partners the real API
+ * has never heard of.
  *
  * Language ids match the profile options in lib/options.js.
  */
 export const EXCHANGE_LANGUAGES = ['amharic', 'afaan_oromo', 'tigrinya', 'english']
 
-export const MATCHING_INDUSTRIES = [
-  { id: 'any', label: 'Any industry' },
-  { id: 'tech', label: 'Tech & Software' },
-  { id: 'health', label: 'Health' },
-  { id: 'finance', label: 'Finance' },
-  { id: 'education', label: 'Education' },
-  { id: 'engineering', label: 'Engineering' },
-]
-
-export const SKILL_LEVELS = ['Beginner', 'Intermediate', 'Advanced']
+/** Ordered by ability rather than alphabetically, since the filter reads as a scale. */
+export const SKILL_LEVELS = ['beginner', 'intermediate', 'advanced']
 
 export const PEERS = [
   {
@@ -26,7 +20,7 @@ export const PEERS = [
     title: 'Product Designer @ EthioPay',
     initials: 'ST',
     industry: 'tech',
-    level: 'Intermediate',
+    level: 'intermediate',
     online: true,
     speaks: ['amharic', 'english'],
     learning: ['afaan_oromo'],
@@ -38,7 +32,7 @@ export const PEERS = [
     title: 'Backend Engineer @ AddisTech',
     initials: 'AK',
     industry: 'tech',
-    level: 'Advanced',
+    level: 'advanced',
     online: true,
     speaks: ['afaan_oromo', 'amharic'],
     learning: ['english'],
@@ -50,7 +44,7 @@ export const PEERS = [
     title: 'Data Analyst @ BlueNile',
     initials: 'HG',
     industry: 'finance',
-    level: 'Intermediate',
+    level: 'intermediate',
     online: true,
     speaks: ['english', 'tigrinya'],
     learning: ['amharic'],
@@ -62,7 +56,7 @@ export const PEERS = [
     title: 'Nurse @ Black Lion Hospital',
     initials: 'YH',
     industry: 'health',
-    level: 'Beginner',
+    level: 'beginner',
     online: false,
     speaks: ['amharic'],
     learning: ['english', 'tigrinya'],
@@ -74,7 +68,7 @@ export const PEERS = [
     title: 'Teacher @ Adama Prep',
     initials: 'MA',
     industry: 'education',
-    level: 'Advanced',
+    level: 'advanced',
     online: true,
     speaks: ['afaan_oromo', 'english'],
     learning: ['tigrinya'],
@@ -86,7 +80,7 @@ export const PEERS = [
     title: 'Site Engineer @ Rift Valley Build',
     initials: 'DB',
     industry: 'engineering',
-    level: 'Intermediate',
+    level: 'intermediate',
     online: false,
     speaks: ['tigrinya', 'amharic'],
     learning: ['english', 'afaan_oromo'],

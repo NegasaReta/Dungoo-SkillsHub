@@ -1,11 +1,12 @@
-import { DAILY_LIMIT_SECONDS, formatDuration } from '../../lib/exchange.js'
+import { formatDuration } from '../../lib/exchange.js'
 import { humanize } from '../../lib/labels.js'
 import NavIcon from '../app/NavIcon.jsx'
 import Panel from '../dashboard/Panel.jsx'
 
 export default function SessionPanel({ session }) {
-  const { peer, running, remaining, usedSeconds, exhausted, pause, resume, end } = session
-  const ratio = remaining / DAILY_LIMIT_SECONDS
+  const { peer, running, remaining, usedSeconds, dailyLimit, exhausted, pause, resume, end } =
+    session
+  const ratio = dailyLimit ? remaining / dailyLimit : 0
 
   return (
     <Panel spotlight className="relative overflow-hidden border border-brand-blue/20 bg-brand-blue/5">
@@ -42,8 +43,8 @@ export default function SessionPanel({ session }) {
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs text-primary/60">
-          {formatDuration(usedSeconds)} of {DAILY_LIMIT_SECONDS / 60} minutes used today. Audio and
-          video calling arrives after the hackathon build.
+          {formatDuration(usedSeconds)} of {Math.round(dailyLimit / 60)} minutes used today. Audio
+          and video calling arrives after the hackathon build.
         </p>
 
         <div className="flex gap-2">

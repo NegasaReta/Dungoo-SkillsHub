@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
+import { fetchMatchingOptions, fetchPeers } from '../api/index.js'
 import AppShell from '../components/app/AppShell.jsx'
 import NavIcon from '../components/app/NavIcon.jsx'
 import Panel from '../components/dashboard/Panel.jsx'
@@ -8,14 +9,15 @@ import MatchCard from '../components/matching/MatchCard.jsx'
 import MatchFilters from '../components/matching/MatchFilters.jsx'
 import SessionPanel from '../components/matching/SessionPanel.jsx'
 import { useUser } from '../context/UserContext.jsx'
-import { EXCHANGE_LANGUAGES, PEERS } from '../data/matching.js'
+import { EXCHANGE_LANGUAGES } from '../data/matching.js'
 import useExchangeSession from '../hooks/useExchangeSession.js'
-import { DAILY_LIMIT_SECONDS, formatDuration } from '../lib/exchange.js'
-import { rankPeers } from '../lib/matching.js'
+import { formatDuration } from '../lib/exchange.js'
 
 /**
  * Seeds the pairing form from the profile: languages the user listed at onboarding
  * are what they can offer, so anything left over is what they might want to learn.
+ * The server applies the same default when no filters are sent, so the first load
+ * looks the same either way.
  */
 function initialFilters(user) {
   const speaks = (user?.languages ?? []).filter((language) =>
@@ -35,11 +37,34 @@ function initialFilters(user) {
 export default function Matching() {
   const { user } = useUser()
   const [filters, setFilters] = useState(() => initialFilters(user))
+  const [options, setOptions] = useState(null)
   const [view, setView] = useState('grid')
-  const session = useExchangeSession()
+  const [matches, setMatches] = useState([])
+  const [error, setError] = useState(null)
+  const session = useExchangeSession({ filters })
 
-  const matches = useMemo(() => rankPeers(PEERS, filters), [filters])
+  useEffect(() => {
+    fetchMatchingOptions().then(setOptions).catch(setError)
+  }, [])
+
+  // Ranking is the server's, so every filter change is a request. Peers are a
+  // small list and the endpoint does no I/O, so this stays cheap.
+  const loadMatches = useCallback(async () => {
+    try {
+      setMatches(await fetchPeers(filters))
+      setError(null)
+    } catch (cause) {
+      setError(cause)
+    }
+  }, [filters])
+
+  useEffect(() => {
+    loadMatches()
+  }, [loadMatches])
+
   const mutualCount = matches.filter((match) => match.mutual).length
+  const dailyMinutes = Math.round(session.dailyLimit / 60)
+  const failure = error ?? session.error
 
   return (
     <AppShell>
@@ -64,18 +89,24 @@ export default function Matching() {
               <p className="text-sm font-semibold text-primary">
                 {formatDuration(session.remaining)} left
               </p>
-              <p className="text-[11px] text-primary/55">
-                Free {DAILY_LIMIT_SECONDS / 60} min daily
-              </p>
+              <p className="text-[11px] text-primary/55">Free {dailyMinutes} min daily</p>
             </div>
           </Panel>
         </div>
+
+        {failure && (
+          <Panel className="border border-danger/30 bg-danger/10">
+            <p className="text-sm text-primary/80">
+              {failure.message ?? 'Something went wrong loading your matches.'}
+            </p>
+          </Panel>
+        )}
 
         {session.peer && <SessionPanel session={session} />}
 
         <div className="grid gap-5 lg:grid-cols-12">
           <div className="lg:col-span-3">
-            <MatchFilters filters={filters} onChange={setFilters} />
+            <MatchFilters filters={filters} onChange={setFilters} options={options} />
           </div>
 
           <div className="lg:col-span-9">
@@ -122,8 +153,8 @@ export default function Matching() {
             {session.exhausted && (
               <Panel className="mt-5 border border-accent/30 bg-accent/10">
                 <p className="text-sm text-primary/80">
-                  You have used today&apos;s free {DAILY_LIMIT_SECONDS / 60} minutes. The allowance
-                  resets tomorrow.
+                  You have used today&apos;s free {dailyMinutes} minutes. The allowance resets
+                  tomorrow.
                 </p>
               </Panel>
             )}
